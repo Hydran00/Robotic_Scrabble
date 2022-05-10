@@ -1,185 +1,157 @@
 <?xml version="1.0"?>
-
-<robot name="soft_robotics_gripper" xmlns:xacro="http://www.ros.org/wiki/xacro">
-<xacro:include filename="$(find soft_robotics_description)/urdf/soft_robotics_trasmission.urdf.xacro" params="" />
-
-<material name="Grey">
-   <color rgba="0.2 0.2 0.2 1"/>
-</material>
-<material name="Blue">
-   <color rgba="0 0 1 1"/>
-</material>
-
-<!-- Come aggiungere questo gripper al modello del robot:
+  <!-- Come aggiungere questo gripper al modello del robot:
 Aggiungere il seguente script commentato dopo la definizione dell'ultimo joint nel file ur_macro.xacro in
 ur_description/urdf/inc
-
-
-    <xacro:include filename="$(find soft_robotics_description)/urdf/soft_robotics_gripper.urdf.xacro" />
+  <xacro:include filename="$(find soft_robotics_description)/urdf/soft_robotics_gripper.urdf.xacro" />
   <xacro:soft_robotics_gripper prefix="" parent="tool0" >
     <origin xyz="0 0 0.004" rpy="0 ${-pi/2} ${pi}"/>
   </xacro:soft_robotics_gripper>
-
- 
 -->
 
+<robot name="soft_robotics_gripper" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find soft_robotics_description)/urdf/soft_robotics_trasmission.urdf.xacro" params="" />
 
+  <material name="Grey">
+    <color rgba="0.2 0.2 0.2 1" />
+  </material>
+  <material name="Blue">
+    <color rgba="0 0 1 1" />
+  </material>
 
-<!--<xacro:include filename="$(find ur_description)/urdf/ur5e2.xacro" />-->
+  <xacro:macro name="soft_robotics_gripper" params="prefix parent *origin">
 
+    <joint name="soft_robotics_gripper_base_joint" type="fixed">
+      <origin xyz="0 0 -0.15" rpy=" 0 0 ${pi/2}" />
+      <parent link="tool0" />
+      <child link="soft_robotics_gripper_base_link" />
+    </joint>
 
-<xacro:macro name="soft_robotics_gripper" params="prefix parent *origin">
-      <link name="soft_robotics_gripper_base_link">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 -0.0095" />
-      <geometry>
-        <mesh filename="package://soft_robotics_description/meshes/base.stl" />
-      </geometry>
-      <material name="Grey"/>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.0095" />
-      <geometry>
-        <mesh filename="package://soft_robotics_description/meshes/base.stl" />
-      </geometry>
-    </collision>
-    <inertial>
-      <origin xyz="2.073e-05   1.45286e-03  -1.1049e-03" rpy="0 0 0" />
-      <mass value="0.168" />
-      <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" 
-               iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04"/>
-    </inertial>
+    <link name="soft_robotics_gripper_base_link">
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 -0.0095" />
+        <geometry>
+          <mesh filename="package://soft_robotics_description/meshes/base.stl" />
+        </geometry>
+        <material name="Grey" />
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 -0.0095" />
+        <geometry>
+          <mesh filename="package://soft_robotics_description/meshes/base.stl" />
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="2.073e-05   1.45286e-03  -1.1049e-03" rpy="0 0 0" />
+        <mass value="0.168" />
+        <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04" />
+      </inertial>
     </link>
 
-      <joint name="soft_robotics_gripper_base_joint" type="fixed">
-    <origin xyz="0 0 -0.15" rpy=" 0 0 0" />
-    <parent link="tool0"/>
-    <child link="soft_robotics_gripper_base_link"/>
-  </joint>
+    <joint name="soft_robotics_gripper_left_finger_joint1" type="revolute">
+      <origin xyz="0 -0.028 0.09" rpy=" 0 0 0" />
+      <parent link="soft_robotics_gripper_base_link" />
+      <child link="soft_robotics_left_finger_link1" />
+      <limit effort="0.1" velocity="1" lower="-0.28" upper="0" />
+    </joint>
 
+    <link name="soft_robotics_left_finger_link1">
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://soft_robotics_description/meshes/link1.stl" />
+        </geometry>
+        <material name="Blue" />
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://soft_robotics_description/meshes/link1.stl" />
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="2.073e-05   1.45286e-03  -1.1049e-03" rpy="0 0 0" />
+        <mass value="0.168" />
+        <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04" />
+      </inertial>
+    </link>
 
- <joint name="soft_robotics_gripper_left_finger_joint1" type="revolute">
-    <origin xyz="0 -0.028 0.09" rpy=" 0 0 0" />
-    <parent link="soft_robotics_gripper_base_link"/>
-    <child link="soft_robotics_left_finger_link1"/>
-    <limit effort="0.1" velocity="1" lower="-0.28" upper="0"/>
-  </joint>
-  
-  <link name="soft_robotics_left_finger_link1">
-    <visual>
-    <origin rpy="0 0 0" xyz="0 0 0" />
-      <geometry>
-        <mesh filename="package://soft_robotics_description/meshes/link1.stl" />
-      </geometry>
-      <material name="Blue"/>
-    </visual>
-    <collision>
-    <origin rpy="0 0 0" xyz="0 0 0" />
-      <geometry>
-        <mesh filename="package://soft_robotics_description/meshes/link1.stl" />
-      </geometry>
-    </collision>
-    <inertial>
-      <origin xyz="2.073e-05   1.45286e-03  -1.1049e-03" rpy="0 0 0" />
-      <mass value="0.168" />
-      <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" 
-               iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04"/>
-    </inertial>
-  </link>
-  
-  
-  
-  
-  
-  <joint name="soft_robotics_gripper_right_finger_joint1" type="revolute">
-    <origin xyz="0 0.028 0.09" rpy=" 0 0 ${-pi}" />
-    <parent link="soft_robotics_gripper_base_link"/>
-    <child link="soft_robotics_right_finger_link1"/>
-    <limit effort="0.1" velocity="1" lower="-0.28" upper="0"/>
-  </joint>
-  
-  <link name="soft_robotics_right_finger_link1">
-    <visual>
-    <origin rpy="0 0 0" xyz="0 0 0" />
-      <geometry>
-        <mesh filename="package://soft_robotics_description/meshes/link1.stl" />
-      </geometry>
-      <material name="Blue"/>
-    </visual>
-    <collision>
-    <origin rpy="0 0 0" xyz="0 0 0" />
-      <geometry>
-        <mesh filename="package://soft_robotics_description/meshes/link1.stl" />
-      </geometry>
-    </collision>
-    <inertial>
-      <origin xyz="2.073e-05   1.45286e-03  -1.1049e-03" rpy="0 0 0" />
-      <mass value="0.168" />
-      <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" 
-               iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04"/>
-    </inertial>
-  </link>
-  
-  
-  
-  
-  
-  <joint name="soft_robotics_gripper_left_finger_joint2" type="fixed">
-    <origin xyz="0 0.009 0.042" rpy=" 0 0 0" />
-    <parent link="soft_robotics_left_finger_link1"/>
-    <child link="soft_robotics_left_finger_link2"/>
-  </joint>
-  
-  <link name="soft_robotics_left_finger_link2">
-    <visual>
-      <geometry>
-        <mesh filename="package://soft_robotics_description/meshes/link2.stl" />
-      </geometry>
-      <material name="Blue"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://soft_robotics_description/meshes/link2.stl" />
-      </geometry>
-    </collision>
-    <inertial>
-      <origin xyz="2.073e-05   1.45286e-03  -1.1049e-03" rpy="0 0 0" />
-      <mass value="0.168" />
-      <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" 
-               iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04"/>
-    </inertial>
-  </link>
-  
-  
-  
-  
-  
-  <joint name="soft_robotics_gripper_right_finger_joint2" type="fixed">
-    <origin xyz="0 0.009 0.042" rpy=" 0 0 0" />
-    <parent link="soft_robotics_right_finger_link1"/>
-    <child link="soft_robotics_right_finger_link2"/>
-  </joint>
-  
-  <link name="soft_robotics_right_finger_link2">
-    <visual>
-      <geometry>
-        <mesh filename="package://soft_robotics_description/meshes/link2.stl" />
-      </geometry>
-      <material name="Blue"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://soft_robotics_description/meshes/link2.stl" />
-      </geometry>
-    </collision>
-    <inertial>
-      <origin xyz="2.073e-05   1.45286e-03  -1.1049e-03" rpy="0 0 0" />
-      <mass value="0.168" />
-      <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" 
-               iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04"/>
-    </inertial>
-  </link>
+    <joint name="soft_robotics_gripper_right_finger_joint1" type="revolute">
+      <origin xyz="0 0.028 0.09" rpy=" 0 0 ${-pi}" />
+      <parent link="soft_robotics_gripper_base_link" />
+      <child link="soft_robotics_right_finger_link1" />
+      <limit effort="0.1" velocity="1" lower="-0.28" upper="0" />
+    </joint>
 
+    <link name="soft_robotics_right_finger_link1">
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://soft_robotics_description/meshes/link1.stl" />
+        </geometry>
+        <material name="Blue" />
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://soft_robotics_description/meshes/link1.stl" />
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="2.073e-05   1.45286e-03  -1.1049e-03" rpy="0 0 0" />
+        <mass value="0.168" />
+        <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04" />
+      </inertial>
+    </link>
+
+    <joint name="soft_robotics_gripper_left_finger_joint2" type="fixed">
+      <origin xyz="0 0.009 0.042" rpy=" 0 0 0" />
+      <parent link="soft_robotics_left_finger_link1" />
+      <child link="soft_robotics_left_finger_link2" />
+    </joint>
+
+    <link name="soft_robotics_left_finger_link2">
+      <visual>
+        <geometry>
+          <mesh filename="package://soft_robotics_description/meshes/link2.stl" />
+        </geometry>
+        <material name="Blue" />
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="package://soft_robotics_description/meshes/link2.stl" />
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="2.073e-05   1.45286e-03  -1.1049e-03" rpy="0 0 0" />
+        <mass value="0.168" />
+        <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04" />
+      </inertial>
+    </link>
+
+    <joint name="soft_robotics_gripper_right_finger_joint2" type="fixed">
+      <origin xyz="0 0.009 0.042" rpy=" 0 0 0" />
+      <parent link="soft_robotics_right_finger_link1" />
+      <child link="soft_robotics_right_finger_link2" />
+    </joint>
+
+    <link name="soft_robotics_right_finger_link2">
+      <visual>
+        <geometry>
+          <mesh filename="package://soft_robotics_description/meshes/link2.stl" />
+        </geometry>
+        <material name="Blue" />
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="package://soft_robotics_description/meshes/link2.stl" />
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="2.073e-05   1.45286e-03  -1.1049e-03" rpy="0 0 0" />
+        <mass value="0.168" />
+        <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04" />
+      </inertial>
+    </link>
 
   </xacro:macro>
 </robot>
