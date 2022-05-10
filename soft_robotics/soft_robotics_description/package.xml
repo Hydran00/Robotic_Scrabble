@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<package format="2">
+
+  <name>soft_robotics_description</name>
+
+  <version>0.1.0</version>
+  <description>
+  Soft robotics's gripper package
+  </description>
+
+  <maintainer email="ndavide.dn@gmail.com">Davide</maintainer>
+  <license>BSD</license>
+  <author email="ndavide.dn@gmail.com">Davide</author>
+
+  <depend>rospy</depend>
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+</package>

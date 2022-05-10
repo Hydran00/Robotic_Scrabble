@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="ur5" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!---->
+  <!--<xacro:include filename="$(find ur_description)/urdf/ur5e2.xacro" />-->
+    <xacro:include filename="$(find soft_robotics_description)/urdf/soft_robotics_gripper.urdf.xacro" />
+
+  
+  <xacro:soft_robotics_gripper prefix="" parent="tool0" >
+    <origin xyz="0 0 0.004" rpy="0 ${-pi/2} ${pi}"/>
+  </xacro:soft_robotics_gripper>
+  
+   Gazebo FT sensor plugin 
+  <gazebo reference="wrist_3_joint">
+    <provideFeedback>true</provideFeedback>
+  </gazebo>
+  <gazebo>
+    <plugin name="ft_sensor_plugin" filename="libgazebo_ros_ft_sensor.so">
+      <updateRate>250.0</updateRate>
+      <topicName>ft_sensor/raw</topicName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <jointName>wrist_3_joint</jointName>
+    </plugin>
+  </gazebo>
+</robot>
