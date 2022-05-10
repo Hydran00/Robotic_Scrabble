@@ -4,18 +4,22 @@ Ur5e playing scrabble against humans
 **ROBOT REALE**
 
 **Calibrazione(solo la prima volta):**
+
 roslaunch ur_calibration calibration_correction.launch  robot_ip:=192.168.0.100 target_filename:=$(rospack find ur_calibration)/etc/ex-ur5e_calibration.yaml 
 
 **Lancio configurazione**
+
 roslaunch ur5e_gripper_moveit_config ur5e_lab.launch
 
 ######################
 
 **SIMULAZIONE IN GAZEBO** 
+
 (simulazione gripper non ancora terminata)
 roslaunch ur5e_gripper_moveit_config ur5e_gazebo.launch
 
 ######################
 
 **Esecuzione del pick and place**
+
 rosrun motion_plan motion_plan_node
