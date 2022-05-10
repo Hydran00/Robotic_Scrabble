@@ -1,0 +1,17 @@
+<launch>
+
+<include file="$(find ur_gazebo)/launch/ur5e_bringup.launch">
+</include>
+
+<include file="$(dirname)/ur5e_moveit_planning_execution.launch">
+    <arg name="sim" value="true"/>
+</include>
+
+<include file="$(dirname)/moveit_rviz.launch">
+    <arg name="rviz_config" value="$(dirname)/laboratorio.rviz"/>
+</include>
+
+<node name="add_collisions" pkg="motion_plan" type="add_collisions"/>
+
+
+</launch>

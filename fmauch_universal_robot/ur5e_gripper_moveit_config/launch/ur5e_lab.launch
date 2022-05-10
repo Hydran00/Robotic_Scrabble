@@ -1,0 +1,18 @@
+<launch>
+
+    <include file="$(find ur_robot_driver)/launch/ur5e_bringup.launch">
+        <arg name="robot_ip" value="192.168.0.100"/>
+        <arg name="kinematics_config" value="$(find ur_calibration)/etc/ex-ur5e_calibration.yaml"/>
+    </include>
+    <include file="$(dirname)/ur5e_moveit_planning_execution.launch">
+        <arg name="sim" value="false"/>
+    </include>
+    
+    <include file="$(dirname)/moveit_rviz.launch">
+        <arg name="rviz_config" value="$(dirname)/laboratorio.rviz"/>
+    </include>
+    
+    <node name="add_collisions" pkg="motion_plan" type="add_collisions"/>
+    
+    
+    </launch>
