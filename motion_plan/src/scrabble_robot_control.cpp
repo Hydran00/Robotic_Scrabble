@@ -42,7 +42,7 @@
 #define BOARD_LENGTH 0.429
 #define CELL_LENGTH BOARD_LENGTH/17
 
-#define RACK_POS_X 0.5
+#define RACK_POS_X 0.2
 #define RACK_POS_Y 0.25
 #define RACK_POS_Z 0.916//Z_DESK + 0.01
 #define RACK_ROT_X 0
@@ -120,7 +120,7 @@ void setup()
     rack.orientation.w = RACK_ROT_W;
 
     for(int i = 0;i<7;i++){
-        RACK_X[i] = -0.13;
+        RACK_X[i] = 0;
     }
     for(int i = 0;i<7;i++){
         RACK_Y[i] = 0.25 + 0.035 * (6-i);
@@ -240,6 +240,9 @@ void execute_Cartesian_Path(geometry_msgs::Pose target){
     moveit_msgs::RobotTrajectory trajectory;
     double fraction = arm_group->computeCartesianPath(waypoints,0.01,0,trajectory);
     cout<<"Fraction: "<<fraction<<endl;
+    if(fraction<1){
+        return;
+    }
     arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan(); 
     int sz_tr = trajectory.joint_trajectory.points.size();
     float duration = 0.1;
@@ -262,7 +265,7 @@ void put_tile_callback(const scrabble::PutTile::ConstPtr &msg){
    
     put_tile_flag = true;
 }
-void put_tile(){
+void put_tile(ros::ServiceClient client,ros::Publisher gripper_pub){
     geometry_msgs::Pose target;
     int random_row,random_column;
     int i=0;
@@ -278,6 +281,10 @@ void put_tile(){
         target.position.z = RACK_POS_Z;
         execute_Cartesian_Path(target);
         ros::Duration(0.3).sleep();
+        close_gripper(gripper_pub,client);
+        target.position.z = 0.85;
+        execute_Cartesian_Path(target);
+        ros::Duration(0.3).sleep();
         target.position.z = RACK_POS_Z-0.1;
         execute_Cartesian_Path(target);
         ros::Duration(0.3).sleep();
@@ -288,9 +295,15 @@ void put_tile(){
         target.position.z = 0.9;
         execute_Cartesian_Path(target);
         ros::Duration(0.3).sleep();
-        target.position.z = 0.917;
+        target.position.z = 0.907 - 0.0073*(17-msg1.target_col[i])/17;
         execute_Cartesian_Path(target);
+        open_gripper1(gripper_pub,client);
         i++;
+        target.position.z = 0.85;
+        execute_Cartesian_Path(target);
+        ros::Duration(0.3).sleep();
+        open_gripper2(gripper_pub,client);
+        ros::Duration(0.3).sleep();
     }
 }
 
@@ -322,7 +335,7 @@ int main(int argc,char** args){
     while (ros::ok())
     {
         if(put_tile_flag){
-            put_tile();
+            put_tile(client,gripper_pub);
             put_tile_flag=false;
         }
     }

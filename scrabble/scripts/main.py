@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import os
+from turtle import position
 import dawg
 from string import ascii_uppercase
 import string
@@ -7,6 +8,10 @@ import random
 import rospy
 from scrabble.msg import New_Word
 from std_msgs.msg import Bool
+from scrabble.msg import PutTile
+import copy
+
+
 path="/home/hydran/catkin_ws/src/scrabble/scripts/"
 def getboard():
     f =open(path+'board.txt','r')
@@ -204,7 +209,6 @@ def costFunc(strr,i,j,id):
         cost = cost * (2 ** dw)
         cost = cost * (3 ** tw)
         cost = cost + cw
-
     return cost
 
 def move():
@@ -244,9 +248,8 @@ def move():
             exit(0)
         else:
             print("Changing Rack ")
-            changeRack(0)
+            changeRack(0,[])
         return
-
     getboardCopy()
     
     if(possStart[ansIndex][2]==1):
@@ -277,6 +280,11 @@ def move():
     
     global cscore 
     cscore += mx
+    print(possArray[ansIndex])
+    if(possArray[ansIndex]==""):
+        changeRack(0)
+    #logica per non inserire lettere  già presenti
+    return possArray[ansIndex],possStart[ansIndex][0]+1,possStart[ansIndex][1]+1,(possStart[ansIndex][2]==1)
 
 def userMove():
     getboard()
@@ -395,14 +403,21 @@ def userMove():
 
 
 
-def changeRack(which):
+def changeRack(which,positions,rack=""):
     if which%2==0:
         global cRack
-        cRack = ""
-        for i in range(0,2):
-            cRack += random.choice(['A','E','I','O','U'])
-        for i in range(2,7):
-            cRack += random.choice(string.ascii_uppercase)
+        print("RACK:_ "+rack+"_")
+        if(rack==""):
+            for i in range(0,2):
+                rack+=random.choice(['A','E','I','O','U'])
+            for i in range(0,5):
+                rack+=random.choice(string.ascii_uppercase)
+        else:
+            for i in range(0,7):
+                if(rack[i]==' '):
+                    rack = rack.replace(' ',random.choice(string.ascii_uppercase),1)
+        cRack=copy.deepcopy(rack)
+            
     '''
     else:
         global userRack
@@ -418,6 +433,7 @@ def passUser():
     passcnt = 1
 
 if __name__ == "__main__":
+    word_pub = rospy.Publisher('/scrabble/put_tile_on_board_command', PutTile, queue_size=10)
     rospy.init_node('game_node', anonymous=True)
     global pub1
     pub1 = rospy.Publisher("scrabble/board_state_update_request",Bool,queue_size=1)
@@ -433,12 +449,14 @@ if __name__ == "__main__":
     movecnt = 0
     global cscore
     cscore = 0
-    global userScore
+    global userSore
+    global passcnt
+    passcnt=""
     userScore = 0
     global cRack
     global userRack
-    changeRack(0)
-    changeRack(1)
+    changeRack(0,positions=[])
+    changeRack(1,positions=[])
     while 1:
         print('\n---Current Board----\n')
         #os.system('python printBoard.py')
@@ -447,12 +465,52 @@ if __name__ == "__main__":
         #print("Computer's Rack: "+cRack+"\t"+userName+"'s Rack: " + userRack+"\n")
         print("Computer's Rack: "+cRack+"\n")
         if movecnt%2==0:
-            move()
-            changeRack(movecnt)
+            word,row,col,mode = move()
+            rack_pos=[0,0,0,0,0,0,0]
+            rrack= copy.deepcopy(cRack)
+            command = PutTile()
+            letterno=1
+            i=0
+            for x in word:
+                rack_counter=1         
+                for y in rrack:
+                    if (y== x):
+                        rrack=rrack.replace(x,' ',1)
+                        print(str(rack_counter)+" "+str(x)+"->"+str(rrack))
+                        rack_pos[i]=rack_counter
+                        print(rack_pos[i])
+                        rack_counter+=1
+                        break
+                    rack_counter+=1
+                i+=1
+                letterno+=1
+            
+            command.rack_pos = copy.deepcopy(rack_pos)
+            print(command.rack_pos) 
+            command.target_row[0] = row
+            command.target_col[0] = col
+            i=0
+            for x in word: 
+                #horizontal
+                if(mode==0):
+                        if(command.rack_pos[i]!=0):
+                            command.target_row[i] = row+i
+                            command.target_col[i] = col
+                #vertical
+                else:
+                        if(command.rack_pos[i]!=0):
+                            command.target_col[i] = col+i
+                            command.target_row[i] = row   
+                i+=1
+            print(command) 
+            input("Press Enter to continue...")
+            word_pub.publish(command)
+            
+            changeRack(movecnt,command.rack_pos,rrack)
             movecnt += 1
         else:
             userIn = input("1.) To Place Word  2.) To Change Rack  3.) To Pass  4.) To Quit\n>")
-            global passcnt
+            #global passcnt
             if userIn == '1':
                 if userMove() == False:
                     continue

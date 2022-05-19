@@ -38,7 +38,7 @@
 #define BOARD_X -0.30423//0.14362//-0.34//0.2
 #define BOARD_Y -0.27894//-0.10823//-0.27//-0.25
 #define BOARD_Z 0.896//0.913
-#define BOARD_LENGTH 0.429
+#define BOARD_LENGTH 0.43
 #define CELL_LENGTH BOARD_LENGTH/17
 
 #define RACK_POS_X 0.5
@@ -256,8 +256,8 @@ void move_random_on_board(int n,ros::Publisher gripper_pub,ros::ServiceClient gr
     geometry_msgs::Pose target;
     int random_row,random_column;
         
-    for(int i=0;i<4;i++ ){
-        ros::Duration(0.2).sleep();
+    for(int i=0;i<30;i++ ){
+        /*ros::Duration(0.2).sleep();
         target.position.x = 0;
         target.position.y = 0.278934;
         target.position.z = 0.8;
@@ -272,8 +272,8 @@ void move_random_on_board(int n,ros::Publisher gripper_pub,ros::ServiceClient gr
         execute_Cartesian_Path(target);
         switch(i){
             case 0:
-            random_row = 9;//rand() % 17+1;
-            random_column = 9;//rand() % 17+1;
+            random_row = 1;//rand() % 17+1;
+            random_column = 2;//rand() % 17+1;
             break;
             case 1:
             random_row = 9;//rand() % 17+1;
@@ -287,23 +287,25 @@ void move_random_on_board(int n,ros::Publisher gripper_pub,ros::ServiceClient gr
             random_row = 8;//rand() % 17+1;
             random_column = 10;//rand() % 17+1;
             break;
-        }
+        }*/
+
         
-        
+        random_row = rand() % 17+1;
+        random_column = rand() % 17+1;
         target = getCellPosition(random_row,random_column);
         target = normalize(target);
         target.position.y = - target.position.y;
-        target.position.z = 0.8;
+        target.position.z = 0.907 - 0.0073*(17-random_row)/17;
         execute_Cartesian_Path(target);
-        
+        /*
         ros::Duration(0.2).sleep();
-        target.position.z = 0.913;
+        target.position.z = 0.910;
         execute_Cartesian_Path(target);
         open_gripper1(gripper_pub,gripper_client);
         ros::Duration(0.2).sleep();
         target.position.z = 0.8;
         execute_Cartesian_Path(target);
-        open_gripper2(gripper_pub,gripper_client);
+        open_gripper2(gripper_pub,gripper_client);*/
     }
     
 }
@@ -319,10 +321,10 @@ int main(int argc,char** args){
     spinner.start();
     setup();
     //Going to home position
-    arm_group->setJointValueTarget(arm_group->getNamedTargetValues("home"));
-    bool success = (arm_group->plan(*arm_motion_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+    //arm_group->setJointValueTarget(arm_group->getNamedTargetValues("home"));
+    //bool success = (arm_group->plan(*arm_motion_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
     //printRED("Closing gripper");
-    arm_group->move();
+    //arm_group->move();
     //attach_srv = n.serviceClient<motion_plan::Attach>("/link_attacher_node/attach");
     //detach_srv =  n.serviceClient<motion_plan::Attach>("/link_attacher_node/detach");
     ros::ServiceClient client;
