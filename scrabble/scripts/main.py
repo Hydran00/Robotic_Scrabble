@@ -72,7 +72,7 @@ def getrack():
     f.close()
 
 def laodDist():
-    f = open(path+'dictionary.txt','r')
+    f = open(path+'ita_dict.txt','r')
     dictArray = (f.read()).split('\n')
     global completion_dawg
     print('here')
@@ -475,7 +475,7 @@ if __name__ == "__main__":
             for x in word:
                 rack_counter=1         
                 for y in rrack:
-                    if (y== x):
+                    if (y== x and x!=' '):
                         rrack=rrack.replace(x,' ',1)
                         print(str(rack_counter)+" "+str(x)+"->"+str(rrack))
                         rack_pos[i]=rack_counter

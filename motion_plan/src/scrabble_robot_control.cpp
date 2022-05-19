@@ -239,11 +239,7 @@ void execute_Cartesian_Path(geometry_msgs::Pose target){
     cout<<"\033[1;34mz: "<<target.position.z<<"\033[0m"<<endl;
     moveit_msgs::RobotTrajectory trajectory;
     double fraction = arm_group->computeCartesianPath(waypoints,0.01,0,trajectory);
-    cout<<"Fraction: "<<fraction<<endl;
-    if(fraction<1){
-        return;
-    }
-    arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan(); 
+    cout<<"Fraction: "<<fraction<<endl; 
     int sz_tr = trajectory.joint_trajectory.points.size();
     float duration = 0.1;
     for (int i=1;i<sz_tr;i++){
@@ -251,9 +247,14 @@ void execute_Cartesian_Path(geometry_msgs::Pose target){
         trajectory.joint_trajectory.points[i].time_from_start = time_dur_ros;
         //cout<<"Time: "<<trajectory.joint_trajectory.points[i].time_from_start<<endl;
         duration +=0.05;
+    }
+    if(fraction==1){
+        arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan();
+        arm_motion_plan->trajectory_ = trajectory;
+        arm_group->execute(*arm_motion_plan);
+        cout<<"execute";
     }     
-    arm_motion_plan->trajectory_ = trajectory;
-    arm_group->execute(*arm_motion_plan);
+    
 }
 
 void put_tile_callback(const scrabble::PutTile::ConstPtr &msg){

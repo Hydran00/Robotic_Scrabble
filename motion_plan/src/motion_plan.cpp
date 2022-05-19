@@ -18,7 +18,7 @@
 
 
 
-#define SIMULATION false
+#define SIMULATION true
 #define PI 3.14159
 #define GRIPPER_MAX_CLOSURE 0.6
 #define GRIPPER_MIN_CLOSURE 0.5
@@ -240,6 +240,10 @@ void execute_Cartesian_Path(geometry_msgs::Pose target){
     moveit_msgs::RobotTrajectory trajectory;
     double fraction = arm_group->computeCartesianPath(waypoints,0.01,0,trajectory);
     cout<<"Fraction: "<<fraction<<endl;
+    if(fraction<1.0){
+        cout<<"no";
+        return;
+    }
     arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan(); 
     int sz_tr = trajectory.joint_trajectory.points.size();
     float duration = 0.1;
