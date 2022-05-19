@@ -75,6 +75,7 @@ def laodDist():
     f = open(path+'dictionary.txt','r')
     dictArray = (f.read()).split('\n')
     global completion_dawg
+    print('here')
     completion_dawg = dawg.CompletionDAWG(dictArray)
     f.close()
 
