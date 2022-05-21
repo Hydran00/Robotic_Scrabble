@@ -119,22 +119,22 @@ void setup()
     rack.orientation.z = RACK_ROT_Z;
     rack.orientation.w = RACK_ROT_W;
 
-    for(int i = 0;i<4;i++){
-        RACK_Y[i] = 0.30 + 0.035 * i+0.009;
+    for(int i = 0;i<7;i++){
+        RACK_Y[i] = 0.20 + 0.035 * i+0.009;
         cout<<"rack_y:"<<RACK_Y[i]<<endl;
-    }
+    }/*
     for(int i = 4;i<7;i++){
         RACK_Y[i] = 0.30 + 0.035 * (i-3)+0.009;
         cout<<"rack_y:"<<RACK_Y[i]<<endl;
-    }
-    for(int i = 0;i<4;i++){
-        RACK_X[i] = 0+0.009;
+    }*/
+    for(int i = 0;i<7;i++){
+        RACK_X[i] = 0-0.009;
         cout<<"rack_x:"<<RACK_X[i]<<endl;
-    }
+    }/*
     for(int i = 4;i<7;i++){
-        RACK_X[i] = 0.07+0.009;
+        RACK_X[i] = 0.07-0.009;
         cout<<"rack_x:"<<RACK_X[i]<<endl;
-    }
+    }*/
 
 }
 void printRED(string s){
@@ -240,15 +240,12 @@ geometry_msgs::Pose getCellPosition(int row,int column){
 void execute_Cartesian_Path(geometry_msgs::Pose target){
     std::vector<geometry_msgs::Pose> waypoints;
     geometry_msgs::Pose current_pose = (arm_group->getCurrentPose()).pose;
-    waypoints.push_back(current_pose);
+    //waypoints.push_back(current_pose);
     waypoints.push_back(target);
     cout<<"\033[1;34mMoving towards:\033[0m\n"<<endl;
     cout<<"\033[1;34mx: "<<target.position.x<<"\033[0m"<<endl;
     cout<<"\033[1;34my: "<<target.position.y<<"\033[0m"<<endl;
     cout<<"\033[1;34mz: "<<target.position.z<<"\033[0m"<<endl;
-    if(target.position.y<0.001){
-        target.position.y=0.0;
-    }
     moveit_msgs::RobotTrajectory trajectory;
     double fraction = arm_group->computeCartesianPath(waypoints,0.01,0,trajectory);
     cout<<"Fraction: "<<fraction<<endl; 
@@ -257,11 +254,13 @@ void execute_Cartesian_Path(geometry_msgs::Pose target){
     }
     int sz_tr = trajectory.joint_trajectory.points.size();
     float duration = 0.1;
+    //trajectory.joint_trajectory.points[0].time_from_start= ros::Duration(0.01);
     for (int i=1;i<sz_tr;i++){
         ros::Duration time_dur_ros = ros::Duration(duration);
         trajectory.joint_trajectory.points[i].time_from_start = time_dur_ros;
         //cout<<"Time: "<<trajectory.joint_trajectory.points[i].time_from_start<<endl;
-        duration +=0.05;
+        duration += 0.05;//(-0.5*(cos(2*3.14*(i)/sz_tr+3.14))+0.5)*0.1;
+        //cout<<"duration:"<<duration<<endl;
     }
     if(fraction==1){
         arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan();
