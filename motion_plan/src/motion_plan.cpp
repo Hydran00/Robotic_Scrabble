@@ -122,11 +122,8 @@ void printRED(string s){
 }
 
 
-geometry_msgs::Pose normalize(geometry_msgs::Pose pose){
-    return pose;
-}
 
-void define_target_pos(geometry_msgs::Pose target,moveit::planning_interface::MoveGroupInterface::Plan plan){
+void define_target_pos(geometry_msgs::Pose target){
     cout<<"\033[1;34mMoving towards:\033[0m\n"<<endl;
     cout<<"\033[1;34mx: "<<target.position.x<<"\033[0m"<<endl;
     cout<<"\033[1;34my: "<<target.position.y<<"\033[0m"<<endl;
@@ -202,10 +199,10 @@ void close_gripper(ros::Publisher pub,ros::ServiceClient close_client){
 void refill_Rack(int letters){
     for(int i=0;i<letters;i++)
     {
-        define_target_pos(tile_stack,*arm_motion_plan);
+        define_target_pos(tile_stack);
         execute_arm_motion_plan();
         arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan(); 
-        define_target_pos(rack,*arm_motion_plan);
+        define_target_pos(rack);
         execute_arm_motion_plan();
     }   
 }
@@ -213,10 +210,10 @@ void refill_Rack(int letters){
 geometry_msgs::Pose getCellPosition(int row,int column){
     geometry_msgs::Pose target;
     cout<<"Row : "<<row<<", Column : "<< column;
-    target.orientation.w = 1;
+    target.orientation.w = 0;
     target.orientation.x = 0;
     target.orientation.y = 0;
-    target.orientation.z = 0;
+    target.orientation.z = 1;
     target.position.z = BOARD_Z;
     //get up-left corner
     target.position.x = BOARD_X-(BOARD_LENGTH/2);
@@ -237,12 +234,13 @@ void execute_Cartesian_Path(geometry_msgs::Pose target){
     cout<<"\033[1;34mx: "<<target.position.x<<"\033[0m"<<endl;
     cout<<"\033[1;34my: "<<target.position.y<<"\033[0m"<<endl;
     cout<<"\033[1;34mz: "<<target.position.z<<"\033[0m"<<endl;
+    cout<<"\033[1;34mz: Quat.y"<<target.orientation.y<<"\033[0m"<<endl;
+    cout<<"\033[1;34mz: Quat.w"<<target.orientation.w<<"\033[0m"<<endl;
     moveit_msgs::RobotTrajectory trajectory;
     double fraction = arm_group->computeCartesianPath(waypoints,0.01,0,trajectory);
     cout<<"Fraction: "<<fraction<<endl;
     if(fraction<1.0){
-        cout<<"no";
-        return;
+        exit(1);
     }
     arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan(); 
     int sz_tr = trajectory.joint_trajectory.points.size();
@@ -255,6 +253,7 @@ void execute_Cartesian_Path(geometry_msgs::Pose target){
     }     
     arm_motion_plan->trajectory_ = trajectory;
     arm_group->execute(*arm_motion_plan);
+    ros::Duration(5).sleep();
 }
 void move_random_on_board(int n,ros::Publisher gripper_pub,ros::ServiceClient gripper_client){
     geometry_msgs::Pose target;
@@ -297,9 +296,13 @@ void move_random_on_board(int n,ros::Publisher gripper_pub,ros::ServiceClient gr
         random_row = rand() % 17+1;
         random_column = rand() % 17+1;
         target = getCellPosition(random_row,random_column);
-        target = normalize(target);
+        //target = normalize(target);
         target.position.y = - target.position.y;
         target.position.z = 0.907 - 0.0073*(17-random_row)/17;
+        if(SIMULATION){
+            target.position.z = 0.907;
+        }
+
         execute_Cartesian_Path(target);
         /*
         ros::Duration(0.2).sleep();
@@ -311,7 +314,6 @@ void move_random_on_board(int n,ros::Publisher gripper_pub,ros::ServiceClient gr
         execute_Cartesian_Path(target);
         open_gripper2(gripper_pub,gripper_client);*/
     }
-    
 }
 
 
@@ -335,19 +337,21 @@ int main(int argc,char** args){
     if(!SIMULATION){
         client = n.serviceClient<std_srvs::Trigger>("/ur_hardware_interface/resend_robot_program");
     }
-    
-    rack = normalize(rack);
-    tile_stack= normalize(tile_stack);
-    
-    
-    
-    printRED("Attacher spinnerPlugin loaded");
-    printRED("Initializing variables");
-    
-    printRED("Open Gripper");
-    open_gripper1(gripper_pub,client);
-    printRED("Loading Collision");
 
+
+
+
+    geometry_msgs::Pose target;
+    target.orientation.y=1;
+    target.orientation.x=target.orientation.w=target.orientation.z=0;
+    target.position.x = 0.5;
+    target.position.y = -0.3;
+    target.position.z = 0.8;
+    //define_target_pos(target);
+    //execute_arm_motion_plan();
+    
+    //rack = normalize(rack);
+    //tile_stack= normalize(tile_stack);
 
     move_random_on_board(5,gripper_pub,client);
 

@@ -47,8 +47,8 @@
 #define RACK_POS_Z 0.916//Z_DESK + 0.01
 #define RACK_ROT_X 0
 #define RACK_ROT_Y 0
-#define RACK_ROT_Z 0
-#define RACK_ROT_W 1
+#define RACK_ROT_Z 1
+#define RACK_ROT_W 0
 
 scrabble::PutTile msg1;
 float RACK_X[7];
@@ -119,12 +119,21 @@ void setup()
     rack.orientation.z = RACK_ROT_Z;
     rack.orientation.w = RACK_ROT_W;
 
-    for(int i = 0;i<7;i++){
-        RACK_X[i] = 0;
+    for(int i = 0;i<4;i++){
+        RACK_Y[i] = 0.30 + 0.035 * i+0.009;
+        cout<<"rack_y:"<<RACK_Y[i]<<endl;
     }
-    for(int i = 0;i<7;i++){
-        RACK_Y[i] = 0.25 + 0.035 * (6-i);
-        cout<<RACK_Y[i]<<endl;
+    for(int i = 4;i<7;i++){
+        RACK_Y[i] = 0.30 + 0.035 * (i-3)+0.009;
+        cout<<"rack_y:"<<RACK_Y[i]<<endl;
+    }
+    for(int i = 0;i<4;i++){
+        RACK_X[i] = 0+0.009;
+        cout<<"rack_x:"<<RACK_X[i]<<endl;
+    }
+    for(int i = 4;i<7;i++){
+        RACK_X[i] = 0.07+0.009;
+        cout<<"rack_x:"<<RACK_X[i]<<endl;
     }
 
 }
@@ -213,10 +222,10 @@ void close_gripper(ros::Publisher pub,ros::ServiceClient close_client){
 geometry_msgs::Pose getCellPosition(int row,int column){
     geometry_msgs::Pose target;
     cout<<"Row : "<<row<<", Column : "<< column;
-    target.orientation.w = 1;
+    target.orientation.w = 0;
     target.orientation.x = 0;
     target.orientation.y = 0;
-    target.orientation.z = 0;
+    target.orientation.z = 1;
     target.position.z = BOARD_Z;
     //get up-left corner
     target.position.x = BOARD_X-(BOARD_LENGTH/2);
@@ -237,9 +246,15 @@ void execute_Cartesian_Path(geometry_msgs::Pose target){
     cout<<"\033[1;34mx: "<<target.position.x<<"\033[0m"<<endl;
     cout<<"\033[1;34my: "<<target.position.y<<"\033[0m"<<endl;
     cout<<"\033[1;34mz: "<<target.position.z<<"\033[0m"<<endl;
+    if(target.position.y<0.001){
+        target.position.y=0.0;
+    }
     moveit_msgs::RobotTrajectory trajectory;
     double fraction = arm_group->computeCartesianPath(waypoints,0.01,0,trajectory);
     cout<<"Fraction: "<<fraction<<endl; 
+    if(fraction<1){
+        exit(1);
+    }
     int sz_tr = trajectory.joint_trajectory.points.size();
     float duration = 0.1;
     for (int i=1;i<sz_tr;i++){
@@ -270,41 +285,43 @@ void put_tile(ros::ServiceClient client,ros::Publisher gripper_pub){
     geometry_msgs::Pose target;
     int random_row,random_column;
     int i=0;
-    while(msg1.rack_pos[i]>0){
+    for(int i=0;i<7;i++){
+        if(msg1.rack_pos[i]==0){
+            continue;
+        }
         //pick up tile
-        target.position.x = RACK_X[msg1.rack_pos[i]]; 
-        target.position.y = RACK_Y[msg1.rack_pos[i]]; 
-        target.position.z = RACK_POS_Z-0.1; 
-        target.orientation.x=target.orientation.y=target.orientation.z=0;
-        target.orientation.w=1;
+        target.position.x = RACK_X[msg1.rack_pos[i]-1];
+        cout<<"x::"<< target.position.x;
+        target.position.y = RACK_Y[msg1.rack_pos[i]-1]; 
+        cout<<"y::"<< target.position.y;
+        target.position.z = 0.86;//RACK_POS_Z-0.1; 
+        target.orientation.x=target.orientation.w=target.orientation.y=0;
+        target.orientation.z=1;
         execute_Cartesian_Path(target);
-        ros::Duration(0.3).sleep();
+        ros::Duration(0.1).sleep();
         target.position.z = RACK_POS_Z;
         execute_Cartesian_Path(target);
-        ros::Duration(0.3).sleep();
+        ros::Duration(0.1).sleep();
         close_gripper(gripper_pub,client);
-        target.position.z = 0.85;
+        target.position.z = 0.86;;
         execute_Cartesian_Path(target);
-        ros::Duration(0.3).sleep();
-        target.position.z = RACK_POS_Z-0.1;
-        execute_Cartesian_Path(target);
-        ros::Duration(0.3).sleep();
+        ros::Duration(0.1).sleep();
         //drop tile
         target = getCellPosition(msg1.target_row[i],msg1.target_col[i]);
         target = normalize(target);
         target.position.y = - target.position.y;
-        target.position.z = 0.9;
+        target.position.z = 0.86;
         execute_Cartesian_Path(target);
-        ros::Duration(0.3).sleep();
-        target.position.z = 0.907 - 0.0073*(17-msg1.target_col[i])/17;
+        ros::Duration(0.1).sleep();
+        target.position.z = 0.907;
+        // target.position.z = 0.907- 0.0073*(17-msg1.target_col[i])/17;
         execute_Cartesian_Path(target);
         open_gripper1(gripper_pub,client);
-        i++;
-        target.position.z = 0.85;
+        target.position.z = 0.86;
         execute_Cartesian_Path(target);
-        ros::Duration(0.3).sleep();
+        ros::Duration(0.1).sleep();
         open_gripper2(gripper_pub,client);
-        ros::Duration(0.3).sleep();
+        ros::Duration(0.1).sleep();
     }
 }
 
