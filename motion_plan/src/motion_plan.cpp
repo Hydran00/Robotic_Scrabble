@@ -18,7 +18,7 @@
 
 
 
-#define SIMULATION true
+#define SIMULATION false
 #define PI 3.14159
 #define GRIPPER_MAX_CLOSURE 0.6
 #define GRIPPER_MIN_CLOSURE 0.5

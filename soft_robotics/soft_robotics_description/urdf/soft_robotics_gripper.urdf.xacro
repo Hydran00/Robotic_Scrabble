@@ -152,6 +152,21 @@ ur_description/urdf/inc
         <inertia ixx="6.69695624e-05" ixy="5.21511788e-09" ixz="-2.74383009e-08" iyy="7.85088161e-05" iyz="5.41105193e-07" izz="1.41819717e-04" />
       </inertial>
     </link>
-
+  
+  <gazebo reference="soft_robotics_gripper_base_link">
+        <material>Gazebo/Grey</material>
+  </gazebo>
+  <gazebo reference="soft_robotics_left_finger_link1">
+        <material>Gazebo/Blue</material>
+  </gazebo>
+  <gazebo reference="soft_robotics_right_finger_link1">
+        <material>Gazebo/Blue</material>
+  </gazebo>
+    <gazebo reference="soft_robotics_left_finger_link2">
+        <material>Gazebo/Blue</material>
+  </gazebo>
+  <gazebo reference="soft_robotics_right_finger_link2">
+        <material>Gazebo/Blue</material>
+  </gazebo>
   </xacro:macro>
 </robot>

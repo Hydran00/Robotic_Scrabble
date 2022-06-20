@@ -3,16 +3,25 @@
 
   <xacro:macro name="soft_robotics_gripper" params="">
 
-    <transmission name="">
+
+    <transmission name="right_finger_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="soft_robotics_gripper_left_finger_joint1">
-         <hardwareInterface>PositionJointInterface</hardwareInterface>
+        <hardwareInterface>PositionJointInterface</hardwareInterface>
       </joint>
-      <actuator name="soft_robotics_gripper_right_finger_joint1">
+      <actuator name="right_finger_motor">
         <mechanicalReduction>1</mechanicalReduction>
-        <hardwareInterface>PositionJointInterface</hardwareInterface> 
+      </actuator>
+    </transmission>
+
+    <transmission name="left_finger_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="soft_robotics_gripper_right_finger_joint1">
+        <hardwareInterface>PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="${prefix}shoulder_lift_motor">
+        <mechanicalReduction>1</mechanicalReduction>
       </actuator>
     </transmission>
   </xacro:macro>
-
 </robot>

@@ -6,10 +6,9 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf/transform_listener.h>
-#include <moveit_msgs/AttachedCollisionObject.h>
+//#include <moveit_msgs/AttachedCollisionObject.h>
 #include <moveit_msgs/CollisionObject.h>
 #include <std_msgs/String.h>
-#include "motion_plan/Attach.h"
 #include "scrabble/PutTile.h"
 #include <std_srvs/Trigger.h>
 
@@ -44,7 +43,7 @@
 
 #define RACK_POS_X 0.2
 #define RACK_POS_Y 0.25
-#define RACK_POS_Z 0.916//Z_DESK + 0.01
+#define RACK_POS_Z 0.918//Z_DESK + 0.01
 #define RACK_ROT_X 0
 #define RACK_ROT_Y 0
 #define RACK_ROT_Z 1
@@ -83,7 +82,7 @@ moveit::planning_interface::MoveGroupInterface *gripper_group;
 moveit::planning_interface::MoveGroupInterface::Plan *arm_motion_plan;
 moveit::planning_interface::MoveGroupInterface::Plan *gripper_plan;
 
-motion_plan::Attach *attach_req, *detach_req;
+//motion_plan::Attach *attach_req, *detach_req;
 ros::ServiceClient *attach_srvp, *detach_srvp,attach_srv,detach_srv;
 
 geometry_msgs::Pose tile_stack,rack;
@@ -178,7 +177,7 @@ void open_gripper1(ros::Publisher pub,ros::ServiceClient open_client){
     std::stringstream ss;
     ss << "open1";
     msg.data = ss.str();
-    ROS_INFO("Sending opening msg to gripper_cmd", msg.data.c_str());
+    cout<<"Sending opening msg to gripper_cmd "<<msg.data.c_str();
     pub.publish(msg);
     ros::Duration(1.3).sleep();
     std_srvs::Trigger srv;
@@ -193,7 +192,7 @@ void open_gripper2(ros::Publisher pub,ros::ServiceClient open_client){
     std::stringstream ss;
     ss << "open2";
     msg.data = ss.str();
-    ROS_INFO("Sending opening msg to gripper_cmd", msg.data.c_str());
+    cout<<"Sending opening msg to gripper_cmd "<<msg.data.c_str();
     pub.publish(msg);
     ros::Duration(1.3).sleep();
     std_srvs::Trigger srv;
@@ -212,7 +211,7 @@ void close_gripper(ros::Publisher pub,ros::ServiceClient close_client){
     std::stringstream ss;
     ss << "close";
     msg.data = ss.str();
-    ROS_INFO("Sending closing msg to gripper_cmd", msg.data.c_str());
+    cout<<"Sending closing msg to gripper_cmd "<<msg.data.c_str();
     pub.publish(msg);
     ros::Duration(1.3).sleep();
     std_srvs::Trigger srv;
@@ -232,7 +231,7 @@ geometry_msgs::Pose getCellPosition(int row,int column){
     target.position.y = BOARD_Y-(BOARD_LENGTH/2);
     //get cell position
     target.position.x = target.position.x  + CELL_LENGTH*(column-1)+ CELL_LENGTH/2;
-    target.position.y = target.position.y  + CELL_LENGTH*(row-1) +CELL_LENGTH/2;
+    target.position.y = target.position.y  + CELL_LENGTH*((17-row)-1) +CELL_LENGTH/2;
     return target;
 }
 
@@ -298,10 +297,11 @@ void put_tile(ros::ServiceClient client,ros::Publisher gripper_pub){
         target.orientation.z=1;
         execute_Cartesian_Path(target);
         ros::Duration(0.1).sleep();
-        target.position.z = RACK_POS_Z;
+        target.position.z = RACK_POS_Z - (0.003/7)*msg1.rack_pos[i];
         execute_Cartesian_Path(target);
         ros::Duration(0.1).sleep();
         close_gripper(gripper_pub,client);
+        ros::Duration(0.1).sleep();
         target.position.z = 0.86;;
         execute_Cartesian_Path(target);
         ros::Duration(0.1).sleep();
@@ -316,7 +316,8 @@ void put_tile(ros::ServiceClient client,ros::Publisher gripper_pub){
         // target.position.z = 0.907- 0.0073*(17-msg1.target_col[i])/17;
         execute_Cartesian_Path(target);
         open_gripper1(gripper_pub,client);
-        target.position.z = 0.86;
+        ros::Duration(0.1).sleep();
+        target.position.z = 0.80;
         execute_Cartesian_Path(target);
         ros::Duration(0.1).sleep();
         open_gripper2(gripper_pub,client);
