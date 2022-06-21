@@ -1,0 +1,7 @@
+gripper_controller:  
+  type: effort_controllers/JointTrajectoryController
+  ns: follow_joint_trajectory
+  joints:
+    - soft_robotics_gripper_left_finger_joint1
+    - soft_robotics_gripper_right_finger_joint1
+

@@ -341,18 +341,11 @@
       <xacro:soft_robotics_gripper prefix="${prefix}" parent="tool0" >
     <origin xyz="0 0 0.004" rpy="0 ${-pi/2} ${pi}"/>
   </xacro:soft_robotics_gripper>
-
-    
-    
-    
-    
-    
-    
-       <!-- <gazebo>
+    <gazebo>
       <plugin name="ros_control" filename="libgazebo_ros_control.so">
         <robotNamespace>/</robotNamespace>
         <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
       </plugin>
-    </gazebo>-->
+    </gazebo>
   </xacro:macro>
 </robot>

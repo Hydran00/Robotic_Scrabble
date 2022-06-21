@@ -9,7 +9,7 @@ ur_description/urdf/inc
 -->
 
 <robot name="soft_robotics_gripper" xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <xacro:include filename="$(find soft_robotics_description)/urdf/soft_robotics_trasmission.urdf.xacro" params="" />
+
 
   <material name="Grey">
     <color rgba="0.2 0.2 0.2 1" />
@@ -51,7 +51,7 @@ ur_description/urdf/inc
       <origin xyz="0 -0.028 0.09" rpy=" 0 0 0" />
       <parent link="soft_robotics_gripper_base_link" />
       <child link="soft_robotics_left_finger_link1" />
-      <limit effort="0.1" velocity="1" lower="-0.28" upper="0" />
+      <limit effort="1" velocity="1" lower="-0.30" upper="0" />
     </joint>
 
     <link name="soft_robotics_left_finger_link1">
@@ -79,7 +79,7 @@ ur_description/urdf/inc
       <origin xyz="0 0.028 0.09" rpy=" 0 0 ${-pi}" />
       <parent link="soft_robotics_gripper_base_link" />
       <child link="soft_robotics_right_finger_link1" />
-      <limit effort="0.1" velocity="1" lower="-0.28" upper="0" />
+      <limit effort="1" velocity="1" lower="-0.30" upper="0" />
     </joint>
 
     <link name="soft_robotics_right_finger_link1">
@@ -168,5 +168,29 @@ ur_description/urdf/inc
   <gazebo reference="soft_robotics_right_finger_link2">
         <material>Gazebo/Blue</material>
   </gazebo>
+
+
+    <!-- TRANSMISSION -->
+    <transmission name="right_finger_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="soft_robotics_gripper_left_finger_joint1">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="right_finger_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <transmission name="left_finger_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="soft_robotics_gripper_right_finger_joint1">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="${prefix}shoulder_lift_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+    
+    
   </xacro:macro>
 </robot>

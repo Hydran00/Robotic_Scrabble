@@ -94,15 +94,11 @@
       <selfCollide>true</selfCollide>
     </gazebo>
 
-    <!--
-      Inject Gazebo ROS Control plugin, which allows us to use ros_control
-      controllers to control the virtual robot hw.
-    -->
-    <gazebo>
+    <!--<gazebo>
       <plugin name="ros_control" filename="libgazebo_ros_control.so">
-        <!--robotNamespace>/</robotNamespace-->
-        <!--robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType-->
+        <robotNamespace>/</robotNamespace>
+        <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
       </plugin>
-    </gazebo>
+    </gazebo>-->
   </xacro:macro>
 </robot>

@@ -9,7 +9,6 @@
 #include <moveit_msgs/AttachedCollisionObject.h>
 #include <moveit_msgs/CollisionObject.h>
 #include <std_msgs/String.h>
-#include "motion_plan/Attach.h"
 #include <std_srvs/Trigger.h>
 
 #define HOME_X 
@@ -80,8 +79,6 @@ moveit::planning_interface::MoveGroupInterface *gripper_group;
 moveit::planning_interface::MoveGroupInterface::Plan *arm_motion_plan;
 moveit::planning_interface::MoveGroupInterface::Plan *gripper_plan;
 
-motion_plan::Attach *attach_req, *detach_req;
-ros::ServiceClient *attach_srvp, *detach_srvp,attach_srv,detach_srv;
 
 geometry_msgs::Pose tile_stack,rack;
 
@@ -99,8 +96,6 @@ void setup()
     //gripper_group->setMaxAccelerationScalingFactor(1);
     arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan();
     //gripper_plan = new moveit::planning_interface::MoveGroupInterface::Plan();
-    attach_srvp = &attach_srv;
-    detach_srvp = &detach_srv;
     tile_stack.position.x = TILE_STACK_POS_Y;
     tile_stack.position.y = TILE_STACK_POS_X;
     tile_stack.position.z = TILE_STACK_POS_Z;
@@ -331,8 +326,7 @@ int main(int argc,char** args){
     //bool success = (arm_group->plan(*arm_motion_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
     //printRED("Closing gripper");
     //arm_group->move();
-    //attach_srv = n.serviceClient<motion_plan::Attach>("/link_attacher_node/attach");
-    //detach_srv =  n.serviceClient<motion_plan::Attach>("/link_attacher_node/detach");
+    
     ros::ServiceClient client;
     if(!SIMULATION){
         client = n.serviceClient<std_srvs::Trigger>("/ur_hardware_interface/resend_robot_program");
@@ -411,7 +405,7 @@ int main(int argc,char** args){
             
             printRED("Closing Gripper");
             close_gripper();
-            attach("tessera"); 
+
             ros::Duration(5.0).sleep();
         }
         

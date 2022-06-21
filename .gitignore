@@ -2,3 +2,4 @@
 motion_plan/src/.vscode/
 scrabble/scripts/.vscode/
 .vscode/
+quat_to_rotm.py

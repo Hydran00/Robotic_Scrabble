@@ -11,7 +11,6 @@ pos_joint_traj_controller:
     - wrist_1_joint
     - wrist_2_joint
     - wrist_3_joint
-
   constraints:
     goal_time: 0.6
     stopped_velocity_tolerance: 0.05
@@ -24,7 +23,13 @@ pos_joint_traj_controller:
   stop_trajectory_duration: 0.5
   state_publish_rate: *loop_hz
   action_monitor_rate: 10
-
+  
+gripper_controller_gazebo:
+  action_ns: follow_joint_trajectoy
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - soft_robotics_gripper_left_finger_joint1
+    - soft_robotics_gripper_right_finger_joint1
 joint_group_pos_controller:
   type: position_controllers/JointGroupPositionController
   joints: *robot_joints
