@@ -33,3 +33,13 @@ roslaunch ur5e_gripper_moveit_config ur5e_gazebo.launch
 ```
 rosrun motion_plan demo.cpp
 ```
+
+
+
+https://user-images.githubusercontent.com/93198865/174913901-e2afb5cb-7508-4986-9b46-b6956a712838.mp4
+
+
+
+https://user-images.githubusercontent.com/93198865/174914093-a0258b16-fbbb-4a10-b888-1c11401b6d9a.mp4
+
+
