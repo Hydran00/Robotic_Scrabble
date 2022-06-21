@@ -9,21 +9,27 @@ roslaunch ur_calibration calibration_correction.launch  robot_ip:=192.168.0.100 
 
 **Lancio configurazione laboratorio**
 
+```
 roslaunch ur5e_gripper_moveit_config ur5e_lab.launch
+```
 
 **Lancio nodo per invio di comandi al gripper:**
 
+```
 rosrun soft_robotics_description gripper_controller.py
+```
 
 ######################
 
 **SIMULAZIONE IN GAZEBO** 
 
-(simulazione gripper non ancora terminata)
+```
 roslaunch ur5e_gripper_moveit_config ur5e_gazebo.launch
-
+```
 ######################
 
-**Esecuzione del pick and place**
+**Esecuzione demo**
 
-rosrun motion_plan motion_plan_node
+```
+rosrun motion_plan demo.cpp
+```
