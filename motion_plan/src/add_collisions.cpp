@@ -1,3 +1,13 @@
+/**
+ * @file add_collisions.cpp
+ * @author Davide Nardi
+ * @brief Ros node that add laboratory's collisions to moveit environment
+ * @version 0.1
+ * @date 2022-06-22
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include<iostream>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include "ros/ros.h"
@@ -15,7 +25,7 @@ using namespace std;
 using namespace ros;
 
 
-static const std::string PLANNING_GROUP_ARM = "manipulator";
+static const std::string PLANNING_GROUP_ARM = "manipulator"; // define moveit planning group name
 
 
 moveit::planning_interface::MoveGroupInterface *arm_group;
@@ -29,6 +39,11 @@ moveit_msgs::CollisionObject *plug;
 void printRED(string s){
     cout<<"\033[1;92m"<<s<<"\033[0m\n";
 }
+
+/**
+ * @brief Function that load collision into the planning scene
+ * 
+ */
 void addCollisions(){
     planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface();
     // Collision object
@@ -143,10 +158,14 @@ void addCollisions(){
     collision_objects.push_back(*top_plate);
     collision_objects.push_back(*plug);
     
-    planning_scene_interface->applyCollisionObjects(collision_objects);
+    planning_scene_interface->applyCollisionObjects(collision_objects); //applyng collision to scene interface
 }
 
-
+/**
+ * @brief Unload collision from moveit when node is stopped by signal
+ * 
+ * @param sig Signal number
+ */
 void removeCollision(int sig){
     cout<<endl<<"Deleting collisions";
     std::vector<std::string> object_ids;

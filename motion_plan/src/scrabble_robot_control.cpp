@@ -1,4 +1,13 @@
-#include<iostream>
+/**
+ * @file scrabble_robot_control.cpp
+ * @author Davide Nardi
+ * @brief Ros node that receive command from the scrabble_node and send motion command to the robot
+ * @version 0.1
+ * @date 2022-06-22
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include <moveit/move_group_interface/move_group_interface.h>
 #include "ros/ros.h"
 #include <cstdlib>
@@ -6,17 +15,9 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf/transform_listener.h>
-//#include <moveit_msgs/AttachedCollisionObject.h>
-#include <moveit_msgs/CollisionObject.h>
 #include <std_msgs/String.h>
 #include "scrabble/PutTile.h"
 #include <std_srvs/Trigger.h>
-
-#define HOME_X 
-#define HOME_Y
-#define HOME_Z
-
-
 
 #define SIMULATION false
 #define PI 3.14159
@@ -60,49 +61,26 @@ using namespace boost;
 
 //define moveit groups' names
 static const std::string PLANNING_GROUP_ARM = "manipulator";
-static const std::string PLANNING_GROUP_GRIPPER = "gripper_group";
-//pointer to moving group and objects
-typedef struct Tile{
-    std::string letter="_";
-    geometry_msgs::Pose pose;
-    void copy(geometry_msgs::Pose p){
-        pose.position.x = p.position.x;
-        pose.position.y = p.position.y;
-        pose.position.z = p.position.z;
-        pose.orientation.x = p.orientation.x;
-        pose.orientation.y = p.orientation.y;
-        pose.orientation.z = p.orientation.z;
-        pose.orientation.w = p.orientation.w;
-    }
-}Tile;
-Tile TILES[TILE_NUM];
-
+//static const std::string PLANNING_GROUP_GRIPPER = "endeffector";
 moveit::planning_interface::MoveGroupInterface *arm_group;
-moveit::planning_interface::MoveGroupInterface *gripper_group;
+//moveit::planning_interface::MoveGroupInterface *gripper_group;
 moveit::planning_interface::MoveGroupInterface::Plan *arm_motion_plan;
-moveit::planning_interface::MoveGroupInterface::Plan *gripper_plan;
+//moveit::planning_interface::MoveGroupInterface::Plan *gripper_plan;
 
-//motion_plan::Attach *attach_req, *detach_req;
-ros::ServiceClient *attach_srvp, *detach_srvp,attach_srv,detach_srv;
 
 geometry_msgs::Pose tile_stack,rack;
-
+/**
+ * @brief Initialize pointers and global variables
+ * 
+ */
 void setup()
 {
     //initialize groups and plans
     arm_group = new moveit::planning_interface::MoveGroupInterface(PLANNING_GROUP_ARM);
-    //arm_group->setPlannerId("AnytimePathShortening");
     arm_group->setPlanningTime(5.0);
     arm_group->setMaxVelocityScalingFactor(0.3);
     arm_group->setMaxAccelerationScalingFactor(0.1);
-    //gripper_group = new moveit::planning_interface::MoveGroupInterface(PLANNING_GROUP_GRIPPER);
-    //gripper_group->setPlanningTime(1);
-    //gripper_group->setMaxVelocityScalingFactor(1);
-    //gripper_group->setMaxAccelerationScalingFactor(1);
     arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan();
-    //gripper_plan = new moveit::planning_interface::MoveGroupInterface::Plan();
-    attach_srvp = &attach_srv;
-    detach_srvp = &detach_srv;
     tile_stack.position.x = TILE_STACK_POS_Y;
     tile_stack.position.y = TILE_STACK_POS_X;
     tile_stack.position.z = TILE_STACK_POS_Z;
@@ -121,30 +99,21 @@ void setup()
     for(int i = 0;i<7;i++){
         RACK_Y[i] = 0.20 + 0.035 * i+0.009;
         cout<<"rack_y:"<<RACK_Y[i]<<endl;
-    }/*
-    for(int i = 4;i<7;i++){
-        RACK_Y[i] = 0.30 + 0.035 * (i-3)+0.009;
-        cout<<"rack_y:"<<RACK_Y[i]<<endl;
-    }*/
+    }
     for(int i = 0;i<7;i++){
         RACK_X[i] = 0-0.009;
         cout<<"rack_x:"<<RACK_X[i]<<endl;
-    }/*
-    for(int i = 4;i<7;i++){
-        RACK_X[i] = 0.07-0.009;
-        cout<<"rack_x:"<<RACK_X[i]<<endl;
-    }*/
-
+    }
 }
 void printRED(string s){
     cout<<"\033[1;92m"<<s<<"\033[0m\n";
 }
-
-
-geometry_msgs::Pose normalize(geometry_msgs::Pose pose){
-    return pose;
-}
-
+/**
+ * @brief Function that can be used to set robot target position at a predefined position
+ * 
+ * @param target set a target position for the EE
+ * @param plan moveit move group planner
+ */
 void define_target_pos(geometry_msgs::Pose target,moveit::planning_interface::MoveGroupInterface::Plan plan){
     cout<<"\033[1;34mMoving towards:\033[0m\n"<<endl;
     cout<<"\033[1;34mx: "<<target.position.x<<"\033[0m"<<endl;
@@ -158,17 +127,21 @@ void define_target_pos(geometry_msgs::Pose target,moveit::planning_interface::Mo
         printRED("Error: Motion plan failed!");
     }
 }
-
+/**
+ * @brief Start motion if a target position was defined with 'define_target_position_ function
+ * 
+ */
 void execute_arm_motion_plan(){
     cout<<endl<<"Motion plan is now executing!";
     arm_group->move();
 }
-
-void open_gripper1(ros::Publisher pub,ros::ServiceClient open_client){
-    //gripper_group->setJointValueTarget(gripper_group->getNamedTargetValues("closed"));
-    //bool success = (gripper_group->plan(*gripper_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-    //printRED("Opening gripper");
-    //gripper_group->move();
+/**
+ * @brief open gripper (little opening)
+ * 
+ * @param pub Ros client that call gripper_controller_node for sending cmd to gripper
+ * @param client Ros service client used to re-establish connection to robot after it drops due to msg sending
+ */
+void open_gripper1(ros::Publisher pub,ros::ServiceClient client){
     if(SIMULATION){
         return;
     }
@@ -181,9 +154,15 @@ void open_gripper1(ros::Publisher pub,ros::ServiceClient open_client){
     pub.publish(msg);
     ros::Duration(1.3).sleep();
     std_srvs::Trigger srv;
-    open_client.call(srv);
+    client.call(srv);
 }
-void open_gripper2(ros::Publisher pub,ros::ServiceClient open_client){
+/**
+ * @brief open gripper (normal opening)
+ * 
+ * @param pub Ros client that call gripper_controller_node for sending cmd to gripper
+ * @param client Ros service client used to re-establish connection to robot after it drops due to msg sending
+ */
+void open_gripper2(ros::Publisher pub,ros::ServiceClient client){
     if(SIMULATION){
         return;
     }
@@ -196,14 +175,15 @@ void open_gripper2(ros::Publisher pub,ros::ServiceClient open_client){
     pub.publish(msg);
     ros::Duration(1.3).sleep();
     std_srvs::Trigger srv;
-    open_client.call(srv);
+    client.call(srv);
 }
-
-void close_gripper(ros::Publisher pub,ros::ServiceClient close_client){
-    //gripper_group->setJointValueTarget(gripper_group->getNamedTargetValues("home"));
-    //bool success = (gripper_group->plan(*gripper_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-    //printRED("Closing gripper");
-    //gripper_group->move();
+/**
+ * @brief close gripper
+ * 
+ * @param pub Ros client that call gripper_controller_node for sending cmd to gripper
+ * @param client Ros service client used to re-establish connection to robot after it drops due to msg sending
+ */
+void close_gripper(ros::Publisher pub,ros::ServiceClient client){
     if(SIMULATION){
         return;
     }
@@ -215,9 +195,14 @@ void close_gripper(ros::Publisher pub,ros::ServiceClient close_client){
     pub.publish(msg);
     ros::Duration(1.3).sleep();
     std_srvs::Trigger srv;
-    close_client.call(srv);
+    client.call(srv);
 }
-
+/**
+ * @brief Compute the position of a cell given row and column
+ * 
+ * @param row Row of the board
+ * @param column Column of the board
+ */
 geometry_msgs::Pose getCellPosition(int row,int column){
     geometry_msgs::Pose target;
     cout<<"Row : "<<row<<", Column : "<< column;
@@ -235,7 +220,11 @@ geometry_msgs::Pose getCellPosition(int row,int column){
     return target;
 }
 
-
+/**
+ * @brief Execute cartesian path given the target position. If no cartesian solution are found, function return immediately otherwise EE will start moving
+ * 
+ * @param target desired target pose (X,Y,Z,x,y,z,w) of EE 
+ */
 void execute_Cartesian_Path(geometry_msgs::Pose target){
     std::vector<geometry_msgs::Pose> waypoints;
     geometry_msgs::Pose current_pose = (arm_group->getCurrentPose()).pose;
@@ -269,7 +258,12 @@ void execute_Cartesian_Path(geometry_msgs::Pose target){
     }     
     
 }
-
+/**
+ * @brief Populate information about desired position of letters in the rack and their correspondents row and column.
+ * This will be called when scrabble_node send msg for putting a word on the board.
+ * 
+ * @param msg Msg that come from scrabble_node
+ */
 void put_tile_callback(const scrabble::PutTile::ConstPtr &msg){
     for(int i=0;i<7;i++){
         msg1.rack_pos[i] = msg->rack_pos[i];
@@ -279,6 +273,12 @@ void put_tile_callback(const scrabble::PutTile::ConstPtr &msg){
    
     put_tile_flag = true;
 }
+/**
+ * @brief Motion plan for putting a word on board one tile at the time
+ * 
+ * @param client Ros client that call gripper_controller_node for sending cmd to gripper
+ * @param gripper_pub 
+ */
 void put_tile(ros::ServiceClient client,ros::Publisher gripper_pub){
     geometry_msgs::Pose target;
     int random_row,random_column;
@@ -307,7 +307,6 @@ void put_tile(ros::ServiceClient client,ros::Publisher gripper_pub){
         ros::Duration(0.1).sleep();
         //drop tile
         target = getCellPosition(msg1.target_row[i],msg1.target_col[i]);
-        target = normalize(target);
         target.position.y = - target.position.y;
         target.position.z = 0.86;
         execute_Cartesian_Path(target);
@@ -345,8 +344,6 @@ int main(int argc,char** args){
     if(!SIMULATION){
         client = n.serviceClient<std_srvs::Trigger>("/ur_hardware_interface/resend_robot_program");
     }
-    rack = normalize(rack);
-    tile_stack= normalize(tile_stack);
     ros::Subscriber sub = n.subscribe("/scrabble/put_tile_on_board_command", 1, put_tile_callback);
     printRED("Subscribed and ready to receive command");
         
