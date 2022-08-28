@@ -1,0 +1,13 @@
+<map id="scrabble_robot_control.cpp" name="scrabble_robot_control.cpp">
+<area shape="rect" id="node1" title="Ros node that receive command from the scrabble_node and send motion command to the robot." alt="" coords="620,5,817,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,224,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="249,87,327,114"/>
+<area shape="rect" id="node4" title=" " alt="" coords="351,87,417,114"/>
+<area shape="rect" id="node5" title=" " alt="" coords="441,87,500,114"/>
+<area shape="rect" id="node6" title=" " alt="" coords="525,80,699,121"/>
+<area shape="rect" id="node7" title=" " alt="" coords="724,87,929,114"/>
+<area shape="rect" id="node8" title=" " alt="" coords="953,87,1121,114"/>
+<area shape="rect" id="node9" title=" " alt="" coords="1145,87,1284,114"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1309,87,1446,114"/>
+<area shape="rect" id="node11" title=" " alt="" coords="1470,87,1607,114"/>
+</map>

@@ -33,13 +33,13 @@
         <joint name="wrist_2_joint" value="0"/>
         <joint name="wrist_3_joint" value="0"/>
     </group_state>
-    <group_state name="home" group="manipulator">
-        <joint name="elbow_joint" value="-1.66"/>
-        <joint name="shoulder_lift_joint" value="-0.052"/>
-        <joint name="shoulder_pan_joint" value="2.69"/>
-        <joint name="wrist_1_joint" value="0.1"/>
-        <joint name="wrist_2_joint" value="-4.72"/>
-        <joint name="wrist_3_joint" value="-2.69"/>
+    <group_state name="home_scrabble" group="manipulator">
+        <joint name="shoulder_pan_joint" value="1.9"/>
+        <joint name="shoulder_lift_joint" value="-1.8"/>
+        <joint name="elbow_joint" value="1.7"/>
+        <joint name="wrist_1_joint" value="-1.5"/>
+        <joint name="wrist_2_joint" value="1.588"/>
+        <joint name="wrist_3_joint" value="-0.488"/>
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="endeffector" parent_link="tool0" group="endeffector" parent_group="manipulator"/>

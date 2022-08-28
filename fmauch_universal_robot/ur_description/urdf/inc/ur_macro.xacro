@@ -337,8 +337,8 @@
       <parent link="${prefix}flange"/>
       <child link="${prefix}tool0"/>
     </joint>
-        <xacro:include filename="$(find soft_robotics_description)/urdf/soft_robotics_gripper.urdf.xacro" />
-      <xacro:soft_robotics_gripper prefix="${prefix}" parent="tool0" >
+    <xacro:include filename="$(find soft_robotics_description)/urdf/soft_robotics_gripper.urdf.xacro" />
+    <xacro:soft_robotics_gripper prefix="${prefix}" parent="tool0" >
     <origin xyz="0 0 0.004" rpy="0 ${-pi/2} ${pi}"/>
   </xacro:soft_robotics_gripper>
     <gazebo>

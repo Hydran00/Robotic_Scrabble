@@ -50,8 +50,6 @@ rospy
 ## Generate messages in the 'msg' folder
  add_message_files(
    FILES
-   Board_State.msg
-   New_Word.msg
    Rack.msg
    PutTile.msg
  )

@@ -182,8 +182,8 @@ void move_random_on_board(int n)
         execute_Cartesian_Path(target);
         ros::Duration(0.2).sleep();
         close_gripper();
-        random_row = rand() % 17 + 1;
-        random_column = rand() % 17 + 1;
+        random_row = 9;//rand() % 17 + 1;
+        random_column = 9;//rand() % 17 + 1;
         target = getCellPosition(random_row, random_column);
         // target = normalize(target);
         target.position.y = -target.position.y;

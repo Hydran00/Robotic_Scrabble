@@ -19,7 +19,7 @@
 #include "scrabble/PutTile.h"
 #include <std_srvs/Trigger.h>
 
-#define SIMULATION false
+#define SIMULATION true
 #define PI 3.14159
 #define GRIPPER_MAX_CLOSURE 0.6
 #define GRIPPER_MIN_CLOSURE 0.5
@@ -36,15 +36,15 @@
 #define TILE_STACK_ROT_Z 0
 #define TILE_STACK_ROT_W 1
 
-#define BOARD_X -0.30423//0.14362//-0.34//0.2
-#define BOARD_Y -0.27894//-0.10823//-0.27//-0.25
-#define BOARD_Z 0.896//0.913
+#define BOARD_X -0.30423
+#define BOARD_Y -0.27894
+#define BOARD_Z 0.896
 #define BOARD_LENGTH 0.429
 #define CELL_LENGTH BOARD_LENGTH/17
 
 #define RACK_POS_X 0.2
 #define RACK_POS_Y 0.25
-#define RACK_POS_Z 0.918//Z_DESK + 0.01
+#define RACK_POS_Z 0.918
 #define RACK_ROT_X 0
 #define RACK_ROT_Y 0
 #define RACK_ROT_Z 1
@@ -61,11 +61,11 @@ using namespace boost;
 
 //define moveit groups' names
 static const std::string PLANNING_GROUP_ARM = "manipulator";
-//static const std::string PLANNING_GROUP_GRIPPER = "endeffector";
+static const std::string PLANNING_GROUP_GRIPPER = "endeffector";
 moveit::planning_interface::MoveGroupInterface *arm_group;
-//moveit::planning_interface::MoveGroupInterface *gripper_group;
+moveit::planning_interface::MoveGroupInterface *gripper_group;
 moveit::planning_interface::MoveGroupInterface::Plan *arm_motion_plan;
-//moveit::planning_interface::MoveGroupInterface::Plan *gripper_plan;
+moveit::planning_interface::MoveGroupInterface::Plan *gripper_plan;
 
 
 geometry_msgs::Pose tile_stack,rack;
@@ -77,10 +77,12 @@ void setup()
 {
     //initialize groups and plans
     arm_group = new moveit::planning_interface::MoveGroupInterface(PLANNING_GROUP_ARM);
+    gripper_group = new moveit::planning_interface::MoveGroupInterface(PLANNING_GROUP_GRIPPER);
     arm_group->setPlanningTime(5.0);
     arm_group->setMaxVelocityScalingFactor(0.3);
     arm_group->setMaxAccelerationScalingFactor(0.1);
     arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan();
+    gripper_plan = new moveit::planning_interface::MoveGroupInterface::Plan();
     tile_stack.position.x = TILE_STACK_POS_Y;
     tile_stack.position.y = TILE_STACK_POS_X;
     tile_stack.position.z = TILE_STACK_POS_Z;
@@ -136,13 +138,17 @@ void execute_arm_motion_plan(){
     arm_group->move();
 }
 /**
- * @brief open gripper (little opening)
+ * @brief open gripper sending "open1" msg to gripper_controller_node
  * 
  * @param pub Ros client that call gripper_controller_node for sending cmd to gripper
  * @param client Ros service client used to re-establish connection to robot after it drops due to msg sending
  */
 void open_gripper1(ros::Publisher pub,ros::ServiceClient client){
     if(SIMULATION){
+        gripper_group->setNamedTarget("open");
+        bool success = (gripper_group->plan(*gripper_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        gripper_group->move();
+        cout<<"gripper"<<endl;
         return;
     }
     std_msgs::String msg;
@@ -157,13 +163,17 @@ void open_gripper1(ros::Publisher pub,ros::ServiceClient client){
     client.call(srv);
 }
 /**
- * @brief open gripper (normal opening)
+ * @brief open gripper sending "open2" msg to gripper_controller_node
  * 
  * @param pub Ros client that call gripper_controller_node for sending cmd to gripper
  * @param client Ros service client used to re-establish connection to robot after it drops due to msg sending
  */
 void open_gripper2(ros::Publisher pub,ros::ServiceClient client){
     if(SIMULATION){
+        gripper_group->setNamedTarget("open");
+        bool success = (gripper_group->plan(*gripper_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        gripper_group->move();
+        cout<<"gripper"<<endl;
         return;
     }
     std_msgs::String msg;
@@ -178,13 +188,17 @@ void open_gripper2(ros::Publisher pub,ros::ServiceClient client){
     client.call(srv);
 }
 /**
- * @brief close gripper
+ * @brief close gripper sending "close" msg to gripper_controller_node
  * 
  * @param pub Ros client that call gripper_controller_node for sending cmd to gripper
  * @param client Ros service client used to re-establish connection to robot after it drops due to msg sending
  */
 void close_gripper(ros::Publisher pub,ros::ServiceClient client){
     if(SIMULATION){
+        gripper_group->setNamedTarget("close");
+        bool success = (gripper_group->plan(*gripper_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        gripper_group->move();
+        cout<<"gripper"<<endl;
         return;
     }
     std_msgs::String msg;
@@ -205,18 +219,16 @@ void close_gripper(ros::Publisher pub,ros::ServiceClient client){
  */
 geometry_msgs::Pose getCellPosition(int row,int column){
     geometry_msgs::Pose target;
-    cout<<"Row : "<<row<<", Column : "<< column;
-    target.orientation.w = 0;
-    target.orientation.x = 0;
-    target.orientation.y = 0;
-    target.orientation.z = 1;
     target.position.z = BOARD_Z;
-    //get up-left corner
+    //calcolo la posizione della cella in alto a sinistra
     target.position.x = BOARD_X-(BOARD_LENGTH/2);
     target.position.y = BOARD_Y-(BOARD_LENGTH/2);
-    //get cell position
+    //calcolo la posizione del centro della cella (CELL_LENGTH = BOARD_X/17)
     target.position.x = target.position.x  + CELL_LENGTH*(column-1)+ CELL_LENGTH/2;
     target.position.y = target.position.y  + CELL_LENGTH*((17-row)-1) +CELL_LENGTH/2;
+    //imposto quaternione per la rotazione dell'ee
+    target.orientation.x=target.orientation.w=target.orientation.y=0;
+    target.orientation.z=1;
     return target;
 }
 
@@ -228,12 +240,12 @@ geometry_msgs::Pose getCellPosition(int row,int column){
 void execute_Cartesian_Path(geometry_msgs::Pose target){
     std::vector<geometry_msgs::Pose> waypoints;
     geometry_msgs::Pose current_pose = (arm_group->getCurrentPose()).pose;
-    //waypoints.push_back(current_pose);
     waypoints.push_back(target);
     cout<<"\033[1;34mMoving towards:\033[0m\n"<<endl;
     cout<<"\033[1;34mx: "<<target.position.x<<"\033[0m"<<endl;
     cout<<"\033[1;34my: "<<target.position.y<<"\033[0m"<<endl;
     cout<<"\033[1;34mz: "<<target.position.z<<"\033[0m"<<endl;
+    cout<<"\033[1;34mz: "<<target.orientation.z<<"\033[0m"<<endl;
     moveit_msgs::RobotTrajectory trajectory;
     double fraction = arm_group->computeCartesianPath(waypoints,0.01,0,trajectory);
     cout<<"Fraction: "<<fraction<<endl; 
@@ -242,21 +254,19 @@ void execute_Cartesian_Path(geometry_msgs::Pose target){
     }
     int sz_tr = trajectory.joint_trajectory.points.size();
     float duration = 0.1;
-    //trajectory.joint_trajectory.points[0].time_from_start= ros::Duration(0.01);
     for (int i=1;i<sz_tr;i++){
         ros::Duration time_dur_ros = ros::Duration(duration);
         trajectory.joint_trajectory.points[i].time_from_start = time_dur_ros;
-        //cout<<"Time: "<<trajectory.joint_trajectory.points[i].time_from_start<<endl;
-        duration += 0.05;//(-0.5*(cos(2*3.14*(i)/sz_tr+3.14))+0.5)*0.1;
-        //cout<<"duration:"<<duration<<endl;
+        duration += 0.05;
+
     }
     if(fraction==1){
         arm_motion_plan = new moveit::planning_interface::MoveGroupInterface::Plan();
         arm_motion_plan->trajectory_ = trajectory;
         arm_group->execute(*arm_motion_plan);
-        cout<<"execute";
-    }     
-    
+        cout<<"executing motion..."<<endl;
+    }        
+    ros::Duration(0.3).sleep();
 }
 /**
  * @brief Populate information about desired position of letters in the rack and their correspondents row and column.
@@ -281,46 +291,47 @@ void put_tile_callback(const scrabble::PutTile::ConstPtr &msg){
  */
 void put_tile(ros::ServiceClient client,ros::Publisher gripper_pub){
     geometry_msgs::Pose target;
-    int random_row,random_column;
-    int i=0;
-    for(int i=0;i<7;i++){
+        for(int i=0;i<7;i++){
+        //come dicevo al cap. 7.5, valuto solo rack_pos != 0
         if(msg1.rack_pos[i]==0){
             continue;
         }
-        //pick up tile
+        //definisco target come la posizione della prima tessera da spostare (vedi Fig 7.2)
         target.position.x = RACK_X[msg1.rack_pos[i]-1];
-        cout<<"x::"<< target.position.x;
         target.position.y = RACK_Y[msg1.rack_pos[i]-1]; 
-        cout<<"y::"<< target.position.y;
-        target.position.z = 0.86;//RACK_POS_Z-0.1; 
+        target.position.z = 0.86;
+        //imposto l'orientamento (tubo dell'aria verso il muro) usando i quaternioni
         target.orientation.x=target.orientation.w=target.orientation.y=0;
         target.orientation.z=1;
+        //mi muovo sopra la tessera del leggio
         execute_Cartesian_Path(target);
-        ros::Duration(0.1).sleep();
+        //mantengo lo stesso target ma cambio l'altezza
+        //il tavolo non è perfettamente in bolla, quindi l'altezza è parametrizzata rispetto alla posizione della tessera
         target.position.z = RACK_POS_Z - (0.003/7)*msg1.rack_pos[i];
+        //eseguo il nuovo movimento (il gripper si allinea con la tessera)        
         execute_Cartesian_Path(target);
-        ros::Duration(0.1).sleep();
+        //gripping della tessera
         close_gripper(gripper_pub,client);
-        ros::Duration(0.1).sleep();
+        //alzo l'end effector
         target.position.z = 0.86;;
         execute_Cartesian_Path(target);
-        ros::Duration(0.1).sleep();
-        //drop tile
+        //calcolo la posizione nel frame del robot della cella target usando riga e colonna che arrivano dal messaggio
         target = getCellPosition(msg1.target_row[i],msg1.target_col[i]);
+		//risultato della funzione ha valore y opposto      
         target.position.y = - target.position.y;
         target.position.z = 0.86;
+        //muovo il robot sopra la cella target
         execute_Cartesian_Path(target);
-        ros::Duration(0.1).sleep();
+        //abbasso l'end effector modificando solo il valore sull'asse z
         target.position.z = 0.907;
-        // target.position.z = 0.907- 0.0073*(17-msg1.target_col[i])/17;
-        execute_Cartesian_Path(target);
+        execute_Cartesian_Path(target); 
+        //rilascio tessera        
         open_gripper1(gripper_pub,client);
-        ros::Duration(0.1).sleep();
+        //alzo nuovamente l'end effector
         target.position.z = 0.80;
         execute_Cartesian_Path(target);
-        ros::Duration(0.1).sleep();
+        //apro completamente le dita
         open_gripper2(gripper_pub,client);
-        ros::Duration(0.1).sleep();
     }
 }
 
@@ -333,13 +344,6 @@ int main(int argc,char** args){
     ros::Publisher gripper_pub = n.advertise<std_msgs::String>("gripper_controller_cmd", 10);
     spinner.start();
     setup();
-    //Going to home position
-    //arm_group->setJointValueTarget(arm_group->getNamedTargetValues("home"));
-    //bool success = (arm_group->plan(*arm_motion_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-    //printRED("Closing gripper");
-    //arm_group->move();
-    //attach_srv = n.serviceClient<motion_plan::Attach>("/link_attacher_node/attach");
-    //detach_srv =  n.serviceClient<motion_plan::Attach>("/link_attacher_node/detach");
     ros::ServiceClient client;
     if(!SIMULATION){
         client = n.serviceClient<std_srvs::Trigger>("/ur_hardware_interface/resend_robot_program");

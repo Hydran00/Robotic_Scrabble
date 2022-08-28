@@ -76,11 +76,10 @@ def getrack():
     f.close()
 
 
-def laodDist():
+def loadDist():
     f = open(path+'ita_dict.txt', 'r')
     dictArray = (f.read()).split('\n')
     global completion_dawg
-    print('here')
     completion_dawg = dawg.CompletionDAWG(dictArray)
     f.close()
 
@@ -233,7 +232,7 @@ def move():
     global possStart
     possStart = []
 
-    laodDist()
+    loadDist()
     global boardArray
     if boardArray[7][7] == '#':
         for x in range(0, 7):
@@ -267,7 +266,7 @@ def move():
             old_board_t.write(line)
 
     if(possStart[ansIndex][2] == 1):
-        print(" ---- HORIZONTLY ---- ")
+        print(" ---- HORIZONTALLY ---- ")
         f = open(path+'board.txt', 'w')
         for i, strr in enumerate(boardCopy):
             for j, char in enumerate(strr):
@@ -482,7 +481,7 @@ if __name__ == "__main__":
            f.write("#################\n")
     f.close()
     print("\n----------- ARE YOU READY TO LOSE ? ------------\n\n\n")
-    userName = input('Please Enter Your Name: ')
+    userName = ''#input('Please Enter Your Name: ')
     movecnt = 0
     global cscore
     cscore = 0
@@ -559,7 +558,7 @@ if __name__ == "__main__":
             changeRack(movecnt, command.rack_pos, rrack)
             movecnt += 1
         else:
-            userIn = input("1.) To Place Word  2.) To Change Rack  3.) To Pass  4.) To Quit\n>")
+            userIn=input("3) To Continue //// 4) To Quit\n>")
             # global passcnt
             if userIn == '1':
                 if userMove() == False:
