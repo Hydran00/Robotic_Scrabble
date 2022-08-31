@@ -50,8 +50,6 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>scrabble</buildtool_depend>
-  <build_depend>gazebo_ros_link_attacher</build_depend>
-  <exec_depend>gazebo_ros_link_attacher</exec_depend>
   <depend>std_msgs</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
