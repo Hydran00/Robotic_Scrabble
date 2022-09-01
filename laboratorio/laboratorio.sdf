@@ -2,7 +2,7 @@
 <sdf version="1.6"> 
  
          <model name="laboratorio"> 
-         <pose name="pose">0 0 0.003 0 0 0</pose>
+         <pose>0 0 0.003 0 0 0</pose>
              <static>1</static> 
              <self_collide>0</self_collide> 
              <allow_auto_disable>1</allow_auto_disable> 
@@ -25,7 +25,7 @@
  
                  <!-- red green blue offsets: model pivot point --> 
                  <!-- 32 is just half of the voxelgrid dimension (64)--> 
-                 <pose name="link_frame">0 0 0 0 -0 0</pose> 
+                 <pose>0 0 0 0 -0 0</pose> 
  
                  <inertial> 
                      <mass>80</mass> 
