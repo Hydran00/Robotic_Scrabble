@@ -62,9 +62,6 @@ catkin_make
 mv /root/catkin_ws/src/laboratorio /root/.gazebo/models
 ```
 
-# Scarabeo
-Ur5e playing scrabble against humans
-
 # Robot reale
 
 Calibrazione(solo la prima volta):
