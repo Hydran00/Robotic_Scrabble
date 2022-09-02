@@ -57,7 +57,10 @@ mv Robotic_Scrabble src
 ```
 catkin_make
 ```
-
+-spostare il modello 3d del tavolo nella cartella dei modelli di gazebo
+```
+mv /root/catkin_ws/src/laboratorio /root/.gazebo/models
+```
 
 # Robotic_Scrabble
 Ur5e playing scrabble against humans
