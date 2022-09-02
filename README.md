@@ -27,6 +27,7 @@ Io ho usato Ubuntu 20.04
 sudo apt-get install ros-noetic-ros-control ros-noetic-ros-controllers
 ```
 -Installare MoveIt!
+
 -Preparare l'ambiente catkin con
 ```
 mkdir catkin_ws && cd catkin_ws
