@@ -7,7 +7,7 @@ Possibilità di usare docker facendo il build dell'immagine usando il docker fil
 ```
 Poi lanciare il container con 
 ```
-docker run -ti --rm -p 6080:80
+docker run -ti --rm -p 6080:80 <id_docker_img>
 ```
 Per visualizzare la grafica, aprire il browser ed inserire come url 
 ```
