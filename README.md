@@ -92,10 +92,14 @@ roslaunch ur5e_gripper_moveit_config ur5e_gazebo.launch
 ```
 ######################
 
-**Esecuzione demo**
+**Iniziare una partita**
 
 ```
-rosrun motion_plan demo.cpp
+rosrun motion_plan scrabble_robot_control_node
+```
+ed in un altro terminale
+```
+rosrun scrabble main.py
 ```
 
 
