@@ -15,7 +15,7 @@ localhost:6080
 ```
 
 # Installazione completa
-Usare docker non permette di usare la scheda video e si ottengono basse prestazioni nella simulazione. Consiglio di installare tutto sul proprio computer. Per far funzionare tutto si possono seguire i passaggi che sono presenti nel docker file presente nella repo. Riassumendo
+Usare docker non permette di usare la scheda video (non ho provato nvidia-docker) e si ottengono basse prestazioni nella simulazione. Consiglio di installare tutto sul proprio computer. Per far funzionare tutto si possono seguire i passaggi che sono presenti nel docker file presente nella repo. Riassumendo
 
 Io ho usato Ubuntu 20.04
 
