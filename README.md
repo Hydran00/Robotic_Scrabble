@@ -15,7 +15,7 @@ localhost:6080
 ```
 
 # Installazione completa
-Usare docker non permette di usare la scheda video (non ho provato nvidia-docker) e si ottengono basse prestazioni nella simulazione. Consiglio di installare tutto sul proprio computer. Per far funzionare tutto si possono seguire i passaggi che sono presenti nel docker file presente nella repo. Riassumendo
+Usare docker non permette di usare la scheda video (non ho provato nvidia-docker) e si ottengono basse prestazioni nella simulazione. Consiglio di installare tutto sul proprio computer. Per far funzionare tutto si possono seguire i passaggi che sono presenti nel dockerfile presente nella repo. Riassumendo
 
 Io ho usato Ubuntu 20.04
 
@@ -37,12 +37,13 @@ catkin_make
 ```
 -Installare tutti i messaggi della Universal Robot in una cartella (di seguito ho usato il path /root/catkin_ws/src)
 ```
-git clone https://github.com/UniversalRobots/Universal_Robots_ROS_scaled_controllers.git"
-git -C /root/catkin_ws/src clone https://github.com/gavanderhoorn/industrial_robot_status_controller.git"
-git clone https://github.com/ros-industrial/ur_msgs.git"
-git clone https://github.com/UniversalRobots/Universal_Robots_ROS_passthrough_controllers"
-git clone https://github.com/UniversalRobots/Universal_Robots_ROS_cartesian_control_msgs/"
-git clone https://github.com/UniversalRobots/Universal_Robots_ROS_controllers_cartesian"
+rosdep init
+git clone https://github.com/UniversalRobots/Universal_Robots_ROS_scaled_controllers.git
+git clone https://github.com/gavanderhoorn/industrial_robot_status_controller.git
+git clone https://github.com/ros-industrial/ur_msgs.git
+git clone https://github.com/UniversalRobots/Universal_Robots_ROS_passthrough_controllers
+git clone https://github.com/UniversalRobots/Universal_Robots_ROS_cartesian_control_msgs/
+git clone https://github.com/UniversalRobots/Universal_Robots_ROS_controllers_cartesian
 rosdep update 
 rosdep install --from-paths /root/catkin_ws/src -i --rosdistro noetic -y
 ```
@@ -56,21 +57,6 @@ mv Robotic_Scrabble src
 ```
 catkin_make
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Robotic_Scrabble
@@ -110,7 +96,7 @@ rosrun motion_plan demo.cpp
 ```
 
 
-
+# DEMO
 https://user-images.githubusercontent.com/93198865/174913901-e2afb5cb-7508-4986-9b46-b6956a712838.mp4
 
 
