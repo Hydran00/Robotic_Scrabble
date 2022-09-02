@@ -1,3 +1,74 @@
+
+# Docker
+Possibilità di usare docker facendo il build dell'immagine usando il docker file. 
+
+```
+ docker build - < Dockerfile
+```
+Poi lanciare il container con 
+```
+docker run -ti --rm -p 6080:80
+```
+Per visualizzare la grafica, aprire il browser ed inserire come url 
+```
+localhost:6080
+```
+
+# Installazione completa
+Usare docker non permette di usare la scheda video e si ottengono basse prestazioni nella simulazione. Consiglio di installare tutto sul proprio computer. Per far funzionare tutto si possono seguire i passaggi che sono presenti nel docker file presente nella repo. Riassumendo
+
+Io ho usato Ubuntu 20.04
+-Installare ROS Noetic e catkin
+-Installare ROS_controllers con
+```
+sudo apt-get install ros-noetic-ros-control ros-noetic-ros-controllers
+```
+-Installare MoveIt!
+-Preparare l'ambiente catkin con
+```
+mkdir catkin_ws && cd catkin_ws
+mkdir src && catkin_init_workspace
+cd ..
+catkin_make
+```
+-Installare tutti i messaggi della Universal Robot in una cartella (di seguito ho usato il path /root/catkin_ws/src)
+```
+git clone https://github.com/UniversalRobots/Universal_Robots_ROS_scaled_controllers.git"
+git -C /root/catkin_ws/src clone https://github.com/gavanderhoorn/industrial_robot_status_controller.git"
+git clone https://github.com/ros-industrial/ur_msgs.git"
+git clone https://github.com/UniversalRobots/Universal_Robots_ROS_passthrough_controllers"
+git clone https://github.com/UniversalRobots/Universal_Robots_ROS_cartesian_control_msgs/"
+git clone https://github.com/UniversalRobots/Universal_Robots_ROS_controllers_cartesian"
+rosdep update 
+rosdep install --from-paths /root/catkin_ws/src -i --rosdistro noetic -y
+```
+-Clonare la repository dentro catkin_ws e rinominare la cartella clonata in src
+```
+cd catkin_ws/
+git clone https://github.com/Hydran00/Robotic_Scrabble.git
+mv Robotic_Scrabble src
+```
+-Build del progetto
+```
+catkin_make
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Robotic_Scrabble
 Ur5e playing scrabble against humans
 
