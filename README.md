@@ -85,11 +85,16 @@ roslaunch ur5e_gripper_moveit_config ur5e_gazebo.launch
 ```
 
 # Iniziare una partita
-
+Installare 'texttable' e 'dawg'
+```
+pip install texttable
+pip install dawg
+```
+Lanciare il nodo di controllo del robot
 ```
 rosrun motion_plan scrabble_robot_control_node
 ```
-ed in un altro terminale
+ed in un altro terminale il nodo del gioco
 ```
 rosrun scrabble main.py
 ```

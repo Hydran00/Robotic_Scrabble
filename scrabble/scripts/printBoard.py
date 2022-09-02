@@ -1,11 +1,12 @@
 #! /usr/bin/env python
 from texttable import Texttable
+import os
 """@package docstring
 Documentation for this module.
 Print board state into stdout
 """
 
-f = open('~/catkin_ws/src/scrabble/scripts/board.txt')
+f = open(os.path.expanduser('~')+"/catkin_ws/src/scrabble/scripts/board.txt")
 board = (f.read()).split('\n')
 t = Texttable()
 fl = []

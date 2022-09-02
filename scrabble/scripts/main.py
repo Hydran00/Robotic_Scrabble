@@ -13,7 +13,7 @@ import copy
 """@package docstring
 Scrabble game ROS node. Manage actions of the game and compute words.
 """
-path = "/home/hydran/catkin_ws/src/scrabble/scripts/"
+path = os.path.expanduser('~')+"/catkin_ws/src/scrabble/scripts/"
 
 
 def getboard():
@@ -483,7 +483,7 @@ def letter_already_on_board(row,col):
     """
     Check whether a letter has to be placed or if it is already on the board
     """
-    f = open('/home/hydran/catkin_ws/src/scrabble/scripts/old_board.txt')
+    f = open(path+'/old_board.txt')
     board = (f.read()).split('\n')
     for i, s in enumerate(board):
         h=""
