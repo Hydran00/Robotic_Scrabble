@@ -8,7 +8,7 @@
              <allow_auto_disable>1</allow_auto_disable> 
  
              <frame name="laboratorio_frame"> 
-                 <pose frame="/world">0 0 0 0 0 0 </pose> 
+                 <pose>0 0 0 0 0 0 </pose> 
              </frame> 
  
              <pose frame="/world">0 0 0 0 0 0</pose> 

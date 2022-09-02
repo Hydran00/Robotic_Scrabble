@@ -7,16 +7,19 @@ from string import ascii_uppercase
 import string
 import random
 import rospy
-from scrabble.msg import New_Word
 from std_msgs.msg import Bool
 from scrabble.msg import PutTile
 import copy
-
-
+"""@package docstring
+Scrabble game ROS node. Manage actions of the game and compute words.
+"""
 path = "/home/hydran/catkin_ws/src/scrabble/scripts/"
 
 
 def getboard():
+    """
+    Load board state into game
+    """
     f = open(path+'board.txt', 'r')
     stringboard = f.read()
     f.close()
@@ -25,6 +28,9 @@ def getboard():
 
 
 def getboardCopy():
+    """
+    Load board copy state into game
+    """
     f = open(path+'board.txt', 'r')
     stringboard = f.read()
     f.close()
@@ -33,6 +39,9 @@ def getboardCopy():
 
 
 def getboardValue():
+    """
+    Load board cell's values into game
+    """
     f = open(path+'boardValue.txt', 'r')
     stringboard = f.read()
     f.close()
@@ -41,6 +50,9 @@ def getboardValue():
 
 
 def getrack():
+    """
+    Load rack state into game and save score for each letter
+    """
     f = open(path+'rack.txt', 'r')
     global stringRack2
     stringRack2 = f.read()
@@ -77,6 +89,9 @@ def getrack():
 
 
 def loadDist():
+    """
+    Create DAWG using dictionary
+    """
     f = open(path+'ita_dict.txt', 'r')
     dictArray = (f.read()).split('\n')
     global completion_dawg
@@ -85,6 +100,9 @@ def loadDist():
 
 
 def crossCheck(char, row, x):
+    """
+    Check if the new word follows scrabble rules for crossing words
+    """
     nword = char
     k = row+1
     row -= 1
@@ -104,6 +122,9 @@ def crossCheck(char, row, x):
 
 
 def checkWord(word, row, x, col, rack, id):
+    """
+    compute new best score word 
+    """
     if x == 17 and ((word in completion_dawg) == False):
         return
 
@@ -144,6 +165,9 @@ def checkWord(word, row, x, col, rack, id):
 
 
 def findPlace(id):
+    """
+    decide where a word can be placed 
+    """
     for i, row in enumerate(boardArray):
         for j, element in enumerate(row):
             if element != '#' and boardArray[i][j-1] == '#':
@@ -156,6 +180,9 @@ def findPlace(id):
 
 
 def crossValue(row, col, id):
+    """
+    compute score of the new word
+    """
     cost = 0
     if id == 1:
         k = row+1
@@ -182,6 +209,9 @@ def crossValue(row, col, id):
 
 
 def costFunc(strr, i, j, id):
+    """
+    Compute a cost for choosing the best word
+    """
     cost = 0
     dw = 0
     tw = 0
@@ -220,6 +250,9 @@ def costFunc(strr, i, j, id):
 
 
 def move():
+    """
+    Computer next move
+    """
     getboard()
     global stringRack2
     global cRack
@@ -234,7 +267,7 @@ def move():
 
     loadDist()
     global boardArray
-    if boardArray[7][7] == '#':
+    if boardArray[8][8] == '#':
         for x in range(0, 7):
             checkWord("", 7, x, 7, stringRack2, 1)
     else:
@@ -295,11 +328,14 @@ def move():
     global cscore
     cscore += mx
     print(possArray[ansIndex])
-    # logica per non inserire lettere  già presenti
     return possArray[ansIndex], possStart[ansIndex][0]+1, possStart[ansIndex][1]+1, (possStart[ansIndex][2] == 1)
 
 
 def userMove():
+    """
+    Everything is commented (manage human vs AI)
+    """
+    
     getboard()
     global boardArray
     getboardCopy()
@@ -309,14 +345,14 @@ def userMove():
     for i in range(len(new_word.word)):
         if(new_word.word[i] != 0):
             word += chr(new_word.word[i])
-    '''
+    
     d = input("Enter 1 for horizontal word\nEnter 2 for vertical word\n>")
     id = int(d)
     if id != 1 and id != 2:
         print("select proper choice\n")
         return False
     word = input('enter your word\n>')
-    '''
+    
 
     word = word.upper()
     print("WORD:"+word)
@@ -349,14 +385,14 @@ def userMove():
             if boardArray[x][y+i] != '#' and boardArray[x][y+i] != word[i]:
                 print("Wrong Placed word entered \n")
                 return False
-            '''
+            
             elif boardArray[x][y+i]=='#':
                 if j == -1:
                     print("letter "+word[i]+" does not exist in rack \n")
                     return False
                 elif j!=-1:
                     userRack = userRack[0:j] + userRack[j+1:]
-            '''
+            
 
     if id == 2:
         boardArray = [*zip(*boardArray)]
@@ -373,14 +409,14 @@ def userMove():
             if boardArray[x+i][y] != '#' and boardArray[x+i][y] != word[i]:
                 print("Wrong Placed word entered \n")
                 return False
-            '''
+            
             elif boardArray[x+i][y]=='#':
                 if j == -1:
                     print("letter "+word[i]+" does not exist in rack \n")
                     return False
                 elif j!=-1:
                     userRack = userRack[0:j] + userRack[j+1:]
-            '''
+            
 
     global userScore
     userScore += costFunc(word, row-1, col-1, id)
@@ -412,10 +448,12 @@ def userMove():
                 f.write('\n')
 
     pub1.publish(True)
-    # Send msg to board_state_publisher to save current state of board
-
+    
 
 def changeRack(which, positions, rack=""):
+    """
+    Refill rack
+    """
     if which % 2 == 0:
         global cRack
         print("RACK:_ "+rack+"_")
@@ -442,6 +480,9 @@ def changeRack(which, positions, rack=""):
             userRack += random.choice(string.ascii_uppercase)
     '''
 def letter_already_on_board(row,col):
+    """
+    Check whether a letter has to be placed or if it is already on the board
+    """
     f = open('/home/hydran/catkin_ws/src/scrabble/scripts/old_board.txt')
     board = (f.read()).split('\n')
     for i, s in enumerate(board):
@@ -462,11 +503,17 @@ def letter_already_on_board(row,col):
             
 
 def passUser():
+    """
+    increment number of pass move of the user in human vs AI
+    """
     global passcnt
     passcnt = 1
 
 
 if __name__ == "__main__":
+    """
+    Game actions loop
+    """
     word_pub = rospy.Publisher(
         '/scrabble/put_tile_on_board_command', PutTile, queue_size=10)
     rospy.init_node('game_node', anonymous=True)
