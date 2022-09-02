@@ -62,37 +62,32 @@ catkin_make
 mv /root/catkin_ws/src/laboratorio /root/.gazebo/models
 ```
 
-# Robotic_Scrabble
+# Scarabeo
 Ur5e playing scrabble against humans
 
-**ROBOT REALE**
+# Robot reale
 
-**Calibrazione(solo la prima volta):**
-
+Calibrazione(solo la prima volta):**
+```
 roslaunch ur_calibration calibration_correction.launch  robot_ip:=192.168.0.100 target_filename:=$(rospack find ur_calibration)/etc/ex-ur5e_calibration.yaml 
-
-**Lancio configurazione laboratorio**
+```
+Lancio configurazione laboratorio**
 
 ```
 roslaunch ur5e_gripper_moveit_config ur5e_lab.launch
 ```
-
-**Lancio nodo per invio di comandi al gripper:**
-
+Lancio nodo per invio di comandi al gripper:**
 ```
 rosrun soft_robotics_description gripper_controller.py
 ```
 
-######################
-
-**SIMULAZIONE IN GAZEBO** 
+# Simulazione Gazebo
 
 ```
 roslaunch ur5e_gripper_moveit_config ur5e_gazebo.launch
 ```
-######################
 
-**Iniziare una partita**
+# Iniziare una partita
 
 ```
 rosrun motion_plan scrabble_robot_control_node
