@@ -10,7 +10,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 #f = open ("Grip.script", "rb")   #Robotiq Gripper
 #f = open ("setzero.script", "rb")  #Robotiq FT sensor
-path = '/home/hydran/catkin_ws/src/soft_robotics/soft_robotics_description/scripts/'
+path = os.path.expanduser('~')+ '/catkin_ws/src/soft_robotics/soft_robotics_description/scripts/'
 def callback(data):
     
     script=''
