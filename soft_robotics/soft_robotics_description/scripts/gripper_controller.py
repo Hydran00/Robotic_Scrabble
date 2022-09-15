@@ -2,6 +2,7 @@
 # Echo client program
 import socket
 import sys
+import os
 import rospy
 from std_msgs.msg import String
 HOST = "192.168.0.100" # The UR IP address
