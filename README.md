@@ -13,6 +13,7 @@ Per visualizzare la grafica, aprire il browser ed inserire come url
 ```
 localhost:6080
 ```
+(Ringrazio @GiovanniPerantoni per l'aiuto)
 
 # Installazione completa
 Usare docker non permette di usare la scheda video (non ho provato nvidia-docker) e si ottengono basse prestazioni nella simulazione. Consiglio di installare tutto sul proprio computer. Per far funzionare tutto si possono seguire i passaggi che sono presenti nel dockerfile presente nella repo. Riassumendo
