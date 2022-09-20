@@ -3,7 +3,7 @@
 Possibilità di usare docker facendo il build dell'immagine usando il docker file. 
 
 ```
- docker build - < Dockerfile
+ docker build -t <nome_file> - < Dockerfile
 ```
 Poi lanciare il container con 
 ```
