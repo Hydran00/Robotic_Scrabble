@@ -3,15 +3,12 @@
 Possibilità di usare docker facendo il build dell'immagine usando il docker file. 
 
 ```
- docker build -t <nome_file> - < Dockerfile
+ docker build --rm  --tag ros1_ur5e_base . --file Dokerfile
 ```
 Poi lanciare il container con 
 ```
-docker run -ti --rm -p 6080:80 <id_docker_img>
-```
-Per visualizzare la grafica, aprire il browser ed inserire come url 
-```
-localhost:6080
+xhost +
+docker run -v /tmp/.X11-unix/:/tmp/.X11-unix/ --volume="$HOME/.Xauthority:/root/.Xauthority:rw" --network=host --name ubuntu_bash --env="DISPLAY" --rm -i -t --privileged ros1_ur5e_base bash
 ```
 (Ringrazio @GiovanniPerantoni per l'aiuto)
 
