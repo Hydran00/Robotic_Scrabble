@@ -74,8 +74,11 @@ RUN pip install dawg texttable
 RUN apt-get install gedit -y
 
 # to build
-#  docker build --rm  --tag ros1_ur5e_base . --file Dokerfile
+#  docker build --rm  --tag ros1_ur5e_base . --file Dockerfile
 
 # to run
 #  xhost +
 #  docker run -v /tmp/.X11-unix/:/tmp/.X11-unix/ --volume="$HOME/.Xauthority:/root/.Xauthority:rw" --network=host --name ubuntu_bash --env="DISPLAY" --rm -i -t --privileged ros1_ur5e_base bash
+
+# to start the simulation (write this line inside the container)
+# roslaunch ur5e_gripper_moveit_config ur5e_gazebo.launch
