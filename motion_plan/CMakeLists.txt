@@ -13,6 +13,7 @@ moveit_ros_planning_interface
 moveit_ros_move_group
 message_generation
 std_msgs
+sensor_msgs
 )
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -72,6 +73,7 @@ std_msgs
  generate_messages(
    DEPENDENCIES
    std_msgs 
+   sensor_msgs
  )
 
 ################################################
@@ -107,6 +109,7 @@ catkin_package(
 # INCLUDE_DIRS include
   LIBRARIES motion_plan
 #  CATKIN_DEPENDS other_catkin_pkg
+  CATKIN_DEPENDS sensor_msgs
 #  DEPENDS system_lib
 )
 
@@ -136,6 +139,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
  add_executable(demo src/demo.cpp)
+ add_executable(unity_subscriber_node src/unity_subscriber.cpp)
   add_executable(add_collisions src/add_collisions.cpp)
 add_executable(scrabble_robot_control_node src/scrabble_robot_control.cpp)
 ## Rename C++ executable without prefix
@@ -156,6 +160,9 @@ add_executable(scrabble_robot_control_node src/scrabble_robot_control.cpp)
    ${catkin_LIBRARIES}
  )
    target_link_libraries(scrabble_robot_control_node
+   ${catkin_LIBRARIES}
+ )
+ target_link_libraries(unity_subscriber_node
    ${catkin_LIBRARIES}
  )
 

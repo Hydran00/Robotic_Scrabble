@@ -35,6 +35,7 @@ moveit_msgs::CollisionObject *electric_panel;
 moveit_msgs::CollisionObject *wall;
 moveit_msgs::CollisionObject *top_plate;
 moveit_msgs::CollisionObject *plug;
+//moveit_msgs::CollisionObject *block;
 
 void printRED(string s){
     cout<<"\033[1;92m"<<s<<"\033[0m\n";
@@ -52,19 +53,22 @@ void addCollisions(){
     wall = new moveit_msgs::CollisionObject();
     top_plate = new moveit_msgs::CollisionObject();
     plug = new moveit_msgs::CollisionObject();
+    //block = new moveit_msgs::CollisionObject();
 
     desk->header.frame_id = arm_group->getPlanningFrame();
     electric_panel->header.frame_id = arm_group->getPlanningFrame();
     wall->header.frame_id = arm_group->getPlanningFrame();
     top_plate->header.frame_id = arm_group->getPlanningFrame();
     plug->header.frame_id = arm_group->getPlanningFrame();
+    //block->header.frame_id = arm_group->getPlanningFrame();
 
     desk->id = "desk";
     electric_panel->id= "electric_panel";
     wall->id= "wall";
     top_plate->id = "top_plate";
+    //block->id = "block";
 
-    shape_msgs::SolidPrimitive primitive1,primitive2,primitive3,primitive4,primitive5;
+    shape_msgs::SolidPrimitive primitive1,primitive2,primitive3,primitive4,primitive5,primitive6;
     //defining desk's collision
     primitive1.type = primitive1.BOX;
     primitive1.dimensions.resize(3);
@@ -96,8 +100,16 @@ void addCollisions(){
     primitive5.dimensions[0] = 0.1;
     primitive5.dimensions[1] = 0.12;
     primitive5.dimensions[2] = 0.09;
+    //defining block collisions
+    /*
+    primitive6.type = primitive6.BOX;
+    primitive6.dimensions.resize(3);
+    primitive6.dimensions[0] = 0.25;
+    primitive6.dimensions[1] = 0.25;
+    primitive6.dimensions[2] = 0.45;
+    */
     
-    geometry_msgs::Pose desk_pose,electric_panel_pose,wall_pose,top_plate_pose,plug_pose;
+    geometry_msgs::Pose desk_pose,electric_panel_pose,wall_pose,top_plate_pose,plug_pose,block_pose;
     //defining desk's pose
     desk_pose.orientation.w = -0.707;
     desk_pose.orientation.z = 0.707;
@@ -128,6 +140,15 @@ void addCollisions(){
     plug_pose.position.x = 0.44;
     plug_pose.position.y = -0.2;
     plug_pose.position.z = 0.92-0.06;
+    //defining block's pose
+    /*
+    block_pose.orientation.z = 0.0;
+    block_pose.orientation.w = 0.0;
+    block_pose.position.x = 0.0; //-0.21;
+    block_pose.position.y = 0.35; //0.245;
+    block_pose.position.z = 0.8675; //0.97;
+    */
+
     //push collisions into vector
     desk->primitives.push_back(primitive1);
     desk->primitive_poses.push_back(desk_pose);
@@ -149,6 +170,10 @@ void addCollisions(){
     plug->primitive_poses.push_back(plug_pose);
     plug->operation = plug->ADD;
 
+    //block->primitives.push_back(primitive6);
+    //block->primitive_poses.push_back(block_pose);
+    //block->operation = block->ADD;
+
     //adding collision to planning scene interface
     std::vector<moveit_msgs::CollisionObject> collision_objects;
     
@@ -157,6 +182,7 @@ void addCollisions(){
     collision_objects.push_back(*wall);
     collision_objects.push_back(*top_plate);
     collision_objects.push_back(*plug);
+    //collision_objects.push_back(*block);
     
     planning_scene_interface->applyCollisionObjects(collision_objects); //applyng collision to scene interface
 }
@@ -174,6 +200,7 @@ void removeCollision(int sig){
     object_ids.push_back(wall->id);
     object_ids.push_back(top_plate->id);
     object_ids.push_back(plug->id);
+    //object_ids.push_back(block->id);
     planning_scene_interface->removeCollisionObjects(object_ids);
     ros::shutdown();
 }

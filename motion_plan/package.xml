@@ -50,6 +50,7 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
   <build_depend>scrabble</build_depend>
   <exec_depend>scrabble</exec_depend>
 
